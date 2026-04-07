@@ -1,58 +1,183 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Inicio</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, Arial, sans-serif;
-      background: #000;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
+<meta charset="UTF-8">
+<title>Inicio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    h1 {
-      margin-bottom: 30px;
-      font-size: 24px;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, Arial, sans-serif;
+  background: #ffffff;
+  color: #111;
+  text-align: center;
+}
 
-    .btn {
-      width: 80%;
-      max-width: 300px;
-      padding: 20px;
-      margin: 10px 0;
-      font-size: 18px;
-      border: none;
-      border-radius: 15px;
-      background: #1e90ff;
-      color: white;
-      text-align: center;
-      text-decoration: none;
-      display: block;
-    }
+h1 {
+  margin-top: 30px;
+  font-size: 26px;
+}
 
-    .btn:active {
-      background: #0f70d0;
-    }
-  </style>
+.container {
+  padding: 20px;
+}
+
+.btn {
+  display: block;
+  width: 85%;
+  max-width: 320px;
+  margin: 15px auto;
+  padding: 18px;
+  font-size: 18px;
+  border-radius: 18px;
+  border: none;
+  background: #007aff;
+  color: white;
+  text-decoration: none;
+}
+
+.btn:active {
+  background: #005ecb;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Juegos */
+.game-btn {
+  background: #34c759;
+}
+
+.card {
+  width: 70px;
+  height: 70px;
+  background: #007aff;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px;
+  font-size: 24px;
+  border-radius: 10px;
+}
+
+#clickBox {
+  width: 150px;
+  height: 150px;
+  background: red;
+  margin: 20px auto;
+  border-radius: 15px;
+}
+</style>
 </head>
+
 <body>
 
+<!-- HOME -->
+<div id="home" class="container">
   <h1>📱 Menú</h1>
 
   <a class="btn" href="docs/EnglishANS.pdf">
     📘 Solucionario Inglés
   </a>
 
-  <a class="btn" href="#">
-    ➕ Próximamente
-  </a>
+  <button class="btn" onclick="showGames()">
+    🎮 Juegos
+  </button>
+</div>
+
+<!-- MENU JUEGOS -->
+<div id="gamesMenu" class="container hidden">
+  <h1>🎮 Juegos</h1>
+
+  <button class="btn game-btn" onclick="startMemory()">
+    🧠 Memoria
+  </button>
+
+  <button class="btn game-btn" onclick="startClickGame()">
+    ⚡ Click rápido
+  </button>
+
+  <button class="btn" onclick="goHome()">⬅ Volver</button>
+</div>
+
+<!-- JUEGO MEMORIA -->
+<div id="memoryGame" class="container hidden">
+  <h1>🧠 Memoria</h1>
+  <div id="board"></div>
+  <button class="btn" onclick="goHome()">⬅ Salir</button>
+</div>
+
+<!-- JUEGO CLICK -->
+<div id="clickGame" class="container hidden">
+  <h1>⚡ Click rápido</h1>
+  <p id="score">Puntos: 0</p>
+  <div id="clickBox" onclick="addPoint()"></div>
+  <button class="btn" onclick="goHome()">⬅ Salir</button>
+</div>
+
+<script>
+function hideAll() {
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("gamesMenu").classList.add("hidden");
+  document.getElementById("memoryGame").classList.add("hidden");
+  document.getElementById("clickGame").classList.add("hidden");
+}
+
+function showGames() {
+  hideAll();
+  document.getElementById("gamesMenu").classList.remove("hidden");
+}
+
+function goHome() {
+  hideAll();
+  document.getElementById("home").classList.remove("hidden");
+}
+
+/* ===== MEMORIA ===== */
+function startMemory() {
+  hideAll();
+  document.getElementById("memoryGame").classList.remove("hidden");
+
+  let emojis = ["🍎","🍎","🚗","🚗","🐶","🐶","⚽","⚽"];
+  emojis.sort(() => Math.random() - 0.5);
+
+  let board = document.getElementById("board");
+  board.innerHTML = "";
+
+  emojis.forEach(e => {
+    let card = document.createElement("div");
+    card.className = "card";
+    card.textContent = "?";
+    card.onclick = () => card.textContent = e;
+    board.appendChild(card);
+  });
+}
+
+/* ===== CLICK GAME ===== */
+let score = 0;
+
+function startClickGame() {
+  hideAll();
+  document.getElementById("clickGame").classList.remove("hidden");
+  score = 0;
+  updateScore();
+}
+
+function addPoint() {
+  score++;
+  updateScore();
+
+  let box = document.getElementById("clickBox");
+  box.style.background = "#" + Math.floor(Math.random()*16777215).toString(16);
+}
+
+function updateScore() {
+  document.getElementById("score").textContent = "Puntos: " + score;
+}
+</script>
 
 </body>
 </html>

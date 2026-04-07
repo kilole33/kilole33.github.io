@@ -1,0 +1,1608 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>MiApp Watch</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #13131a;
+    --bg3: #1c1c26;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #f0f0ff;
+    --muted: #888899;
+    --border: rgba(108,99,255,0.2);
+    --radius: 14px;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-size: 13px;
+  }
+
+  /* SCREENS */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* TOP BAR */
+  .topbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px 8px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar h1 { font-size: 15px; font-weight: 600; flex: 1; letter-spacing: -0.3px; }
+  .back-btn {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--accent); padding: 5px 10px; border-radius: 20px;
+    font-size: 12px; font-family: var(--font); cursor: pointer;
+    white-space: nowrap;
+  }
+  .back-btn:active { opacity: 0.7; }
+
+  /* HOME */
+  .home-header {
+    padding: 20px 14px 10px;
+    background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+  }
+  .home-title { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+  .home-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .home-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; padding: 14px;
+  }
+
+  .home-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 12px;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.12s;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; gap: 8px;
+    min-height: 90px; justify-content: center;
+  }
+  .home-card:active { transform: scale(0.95); }
+  .home-card .icon { font-size: 24px; }
+  .home-card .label { font-size: 12px; font-weight: 500; }
+  .home-card.c1 { border-color: rgba(108,99,255,0.4); }
+  .home-card.c2 { border-color: rgba(255,101,132,0.4); }
+  .home-card.c3 { border-color: rgba(67,233,123,0.4); }
+  .home-card.c4 { border-color: rgba(255,200,80,0.4); }
+  .home-card.c1:active { background: rgba(108,99,255,0.1); }
+  .home-card.c2:active { background: rgba(255,101,132,0.1); }
+  .home-card.c3:active { background: rgba(67,233,123,0.1); }
+  .home-card.c4:active { background: rgba(255,200,80,0.1); }
+
+  /* SECTION CONTENT */
+  .content { flex: 1; overflow-y: auto; padding: 10px 12px 20px; }
+
+  /* BUTTONS LIST */
+  .btn-list { display: flex; flex-direction: column; gap: 8px; }
+  .btn-item {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 13px 14px;
+    cursor: pointer; display: flex; align-items: center; gap: 10px;
+    transition: background 0.12s;
+  }
+  .btn-item:active { background: rgba(108,99,255,0.15); }
+  .btn-item .bi { font-size: 18px; }
+  .btn-item .bt { flex: 1; }
+  .btn-item .bt-title { font-size: 13px; font-weight: 500; }
+  .btn-item .bt-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .btn-item .arr { color: var(--muted); font-size: 14px; }
+
+  /* VALENCIAS TABLES */
+  .val-section { margin-bottom: 14px; }
+  .val-section-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--accent);
+    padding: 8px 0 6px; border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .val-group-title {
+    font-size: 10px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin: 10px 0 5px; padding: 4px 8px;
+    background: var(--bg3); border-radius: 6px;
+  }
+
+  .vtable {
+    width: 100%; border-collapse: collapse;
+    background: var(--bg2); border-radius: 10px;
+    overflow: hidden; font-size: 11px; margin-bottom: 8px;
+  }
+  .vtable thead th {
+    background: var(--bg3); padding: 6px 8px;
+    font-size: 10px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    text-align: left; border-bottom: 1px solid var(--border);
+  }
+  .vtable tbody tr { border-bottom: 1px solid rgba(108,99,255,0.08); }
+  .vtable tbody tr:last-child { border-bottom: none; }
+  .vtable tbody td { padding: 7px 8px; vertical-align: middle; }
+  .vtable .sym {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 6px;
+    background: rgba(108,99,255,0.15); border: 1px solid rgba(108,99,255,0.3);
+    font-weight: 600; font-size: 11px; color: var(--accent);
+    font-family: var(--mono);
+  }
+  .vtable .val-badge {
+    display: inline-block; padding: 2px 6px; border-radius: 10px;
+    font-family: var(--mono); font-size: 10px; font-weight: 500;
+    background: rgba(255,101,132,0.12); color: var(--accent2);
+    border: 1px solid rgba(255,101,132,0.2);
+    margin: 1px;
+  }
+  .vtable .val-badge.pos {
+    background: rgba(67,233,123,0.1); color: var(--accent3);
+    border-color: rgba(67,233,123,0.2);
+  }
+  .note-text {
+    font-size: 10px; color: var(--muted); font-style: italic;
+    padding: 6px 8px; background: var(--bg2); border-radius: 8px;
+    border-left: 3px solid var(--accent); margin-top: 6px;
+  }
+  .handwritten-note {
+    background: rgba(255,200,80,0.08); border: 1px solid rgba(255,200,80,0.25);
+    border-radius: 10px; padding: 10px 12px; margin: 10px 0;
+    font-size: 11px; color: rgba(255,200,80,0.9);
+  }
+  .handwritten-note .hn-title { font-weight: 600; margin-bottom: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .prefix-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+  .prefix-pill {
+    padding: 3px 8px; border-radius: 20px;
+    font-family: var(--mono); font-size: 10px;
+    background: rgba(255,200,80,0.12); border: 1px solid rgba(255,200,80,0.3);
+    color: rgba(255,200,80,0.9);
+  }
+
+  /* QUIZ */
+  #quiz-container { padding: 10px; }
+  .quiz-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .quiz-score { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--accent); }
+  .quiz-progress-bar {
+    width: 100%; height: 4px; background: var(--bg3);
+    border-radius: 2px; margin-bottom: 16px;
+  }
+  .quiz-progress-fill {
+    height: 100%; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.3s;
+  }
+  .quiz-question {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px;
+    margin-bottom: 14px; min-height: 80px;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .quiz-q-text { font-size: 13px; font-weight: 500; line-height: 1.4; }
+  .quiz-element { font-family: var(--mono); font-size: 20px; color: var(--accent); font-weight: 600; }
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .quiz-opt {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 8px;
+    cursor: pointer; text-align: center;
+    font-family: var(--mono); font-size: 12px; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .quiz-opt:active { transform: scale(0.95); }
+  .quiz-opt.correct { background: rgba(67,233,123,0.15); border-color: var(--accent3); color: var(--accent3); }
+  .quiz-opt.wrong { background: rgba(255,101,132,0.15); border-color: var(--accent2); color: var(--accent2); }
+  .quiz-feedback {
+    text-align: center; padding: 10px;
+    font-size: 12px; border-radius: 10px;
+    margin-top: 10px; display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { background: rgba(67,233,123,0.1); color: var(--accent3); }
+  .quiz-feedback.ko { background: rgba(255,101,132,0.1); color: var(--accent2); }
+  .quiz-next {
+    width: 100%; margin-top: 10px; padding: 12px;
+    background: var(--accent); color: white;
+    border: none; border-radius: 10px; font-family: var(--font);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    display: none;
+  }
+  .quiz-next.show { display: block; }
+  .quiz-next:active { opacity: 0.8; }
+  .quiz-end { text-align: center; padding: 20px; }
+  .quiz-end-score { font-size: 36px; font-weight: 600; color: var(--accent); font-family: var(--mono); }
+  .quiz-restart {
+    margin-top: 14px; padding: 12px 20px;
+    background: var(--accent); color: white; border: none;
+    border-radius: 10px; font-family: var(--font); font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* MUSIC */
+  .music-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+    margin-bottom: 10px;
+  }
+  .music-song-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .music-artist { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+  .music-viz {
+    display: flex; align-items: center; gap: 2px;
+    height: 30px; margin-bottom: 14px; justify-content: center;
+  }
+  .music-bar {
+    width: 3px; border-radius: 2px;
+    background: var(--accent); opacity: 0.4;
+    transition: height 0.1s;
+    animation: none;
+  }
+  .music-bar.playing { animation: wave 0.8s ease-in-out infinite alternate; opacity: 1; }
+  @keyframes wave {
+    from { height: 4px; }
+    to { height: 24px; }
+  }
+  .music-controls {
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    margin-bottom: 14px;
+  }
+  .ctrl-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--bg3);
+    color: var(--text); font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ctrl-btn.play-btn {
+    width: 48px; height: 48px;
+    background: var(--accent); border-color: var(--accent);
+    font-size: 18px;
+  }
+  .ctrl-btn:active { opacity: 0.7; transform: scale(0.95); }
+  .volume-row { display: flex; align-items: center; gap: 8px; }
+  .vol-icon { font-size: 14px; cursor: pointer; }
+  .vol-slider {
+    flex: 1; height: 4px; -webkit-appearance: none; appearance: none;
+    background: var(--bg3); border-radius: 2px; outline: none;
+  }
+  .vol-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+  }
+  .music-progress { margin-bottom: 10px; }
+  .prog-bar {
+    width: 100%; height: 4px; background: var(--bg3);
+    border-radius: 2px; margin-bottom: 5px; cursor: pointer;
+    position: relative;
+  }
+  .prog-fill {
+    height: 100%; border-radius: 2px; background: var(--accent);
+    width: 0%; transition: width 0.5s linear;
+  }
+  .prog-times { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); font-family: var(--mono); }
+
+  /* GAMES */
+  .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .game-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 10px;
+    cursor: pointer; text-align: center;
+    transition: transform 0.1s, border-color 0.1s;
+  }
+  .game-card:active { transform: scale(0.95); }
+  .game-icon { font-size: 26px; margin-bottom: 6px; }
+  .game-name { font-size: 11px; font-weight: 500; }
+  .game-card.gc1 { border-color: rgba(108,99,255,0.4); }
+  .game-card.gc2 { border-color: rgba(67,233,123,0.4); }
+  .game-card.gc3 { border-color: rgba(255,101,132,0.4); }
+  .game-card.gc4 { border-color: rgba(255,200,80,0.4); }
+  .game-card.gc5 { border-color: rgba(100,200,255,0.4); }
+  .game-card.gc6 { border-color: rgba(255,150,50,0.4); }
+
+  /* SUDOKU */
+  #sudoku-screen .content { padding: 8px; }
+  .sudoku-diff {
+    display: flex; gap: 6px; margin-bottom: 10px; justify-content: center;
+  }
+  .diff-btn {
+    padding: 6px 10px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--bg3);
+    color: var(--muted); font-size: 10px; font-family: var(--font);
+    cursor: pointer; font-weight: 500;
+  }
+  .diff-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .sudoku-grid {
+    display: grid; grid-template-columns: repeat(9, 1fr);
+    gap: 1px; background: rgba(108,99,255,0.3);
+    border: 2px solid rgba(108,99,255,0.4); border-radius: 8px;
+    overflow: hidden; width: 100%; max-width: 320px; margin: 0 auto;
+  }
+  .sudoku-cell {
+    background: var(--bg2); aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-family: var(--mono); font-weight: 500;
+    cursor: pointer; transition: background 0.1s;
+    border: none; color: var(--text);
+  }
+  .sudoku-cell.given { color: var(--accent); font-weight: 600; }
+  .sudoku-cell.selected { background: rgba(108,99,255,0.2); }
+  .sudoku-cell.error { background: rgba(255,101,132,0.15); color: var(--accent2); }
+  .sudoku-cell.correct { background: rgba(67,233,123,0.1); }
+  .sudoku-cell:nth-child(3n+1):not(:nth-child(9n+1)) { border-left: 2px solid rgba(108,99,255,0.4); }
+  .sudoku-cell:nth-child(n+19):nth-child(-n+27),
+  .sudoku-cell:nth-child(n+46):nth-child(-n+54) {
+    border-top: 2px solid rgba(108,99,255,0.4);
+  }
+  .sudoku-numpad {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 6px; margin: 10px auto; max-width: 320px;
+  }
+  .num-btn {
+    padding: 10px; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); font-family: var(--mono);
+    font-size: 14px; cursor: pointer; text-align: center;
+  }
+  .num-btn:active { background: rgba(108,99,255,0.2); }
+  .sudoku-actions { display: flex; gap: 8px; justify-content: center; max-width: 320px; margin: 0 auto; }
+  .sudoku-act-btn {
+    flex: 1; padding: 10px; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); font-family: var(--font);
+    font-size: 11px; cursor: pointer;
+  }
+  .sudoku-win {
+    display: none; text-align: center; padding: 20px;
+    background: rgba(67,233,123,0.1); border-radius: var(--radius);
+    margin-top: 10px; border: 1px solid rgba(67,233,123,0.3);
+  }
+  .sudoku-win.show { display: block; }
+
+  /* DINO GAME */
+  #dino-canvas-wrap {
+    background: #111; border-radius: 10px; overflow: hidden;
+    margin: 0 auto; max-width: 320px; position: relative;
+  }
+  #dino-canvas { display: block; width: 100%; height: auto; touch-action: none; }
+  #dino-tap-hint {
+    text-align: center; font-size: 11px; color: var(--muted); margin-top: 8px;
+  }
+
+  /* SNAKE */
+  #snake-wrap { max-width: 260px; margin: 0 auto; text-align: center; }
+  #snake-canvas { border: 1px solid var(--border); border-radius: 8px; background: #111; display: block; width: 100%; height: auto; }
+  .snake-score { font-family: var(--mono); font-size: 16px; color: var(--accent); margin: 8px 0; }
+  .dpad {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr; gap: 4px;
+    width: 120px; margin: 10px auto;
+  }
+  .dpad-btn {
+    padding: 10px; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .dpad-btn:active { background: rgba(108,99,255,0.2); }
+  .dpad-center { grid-column: 2; grid-row: 2; }
+
+  /* MEMORY GAME */
+  #memory-wrap { max-width: 300px; margin: 0 auto; text-align: center; }
+  .memory-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin: 10px 0; }
+  .mem-card {
+    aspect-ratio: 1; border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; background: var(--bg3); border: 1px solid var(--border);
+    transition: transform 0.2s, background 0.2s;
+    user-select: none;
+  }
+  .mem-card .face { display: none; }
+  .mem-card.revealed { background: var(--bg2); }
+  .mem-card.revealed .face { display: block; }
+  .mem-card.matched { background: rgba(67,233,123,0.15); border-color: rgba(67,233,123,0.4); pointer-events: none; }
+
+  /* TRIVIA */
+  #trivia-wrap { padding: 0; }
+  .trivia-q { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; font-size: 12px; line-height: 1.5; font-weight: 500; }
+  .trivia-opts { display: flex; flex-direction: column; gap: 7px; }
+  .trivia-opt { padding: 11px 12px; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; font-size: 11px; transition: background 0.1s; }
+  .trivia-opt:active { transform: scale(0.98); }
+  .trivia-opt.correct { background: rgba(67,233,123,0.15); border-color: var(--accent3); color: var(--accent3); }
+  .trivia-opt.wrong { background: rgba(255,101,132,0.15); border-color: var(--accent2); color: var(--accent2); }
+  .trivia-score { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+  .trivia-next { width: 100%; margin-top: 10px; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 10px; font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; display: none; }
+  .trivia-next.show { display: block; }
+
+  /* 2048 */
+  #g2048-wrap { max-width: 280px; margin: 0 auto; text-align: center; }
+  #g2048-score { font-family: var(--mono); font-size: 16px; color: var(--accent); margin-bottom: 8px; }
+  .g2048-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; background: #1a1a2e; border-radius: 10px; padding: 6px; margin-bottom: 10px; }
+  .g2048-cell {
+    aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center;
+    justify-content: center; font-weight: 600; font-size: 12px;
+    font-family: var(--mono); transition: all 0.1s;
+  }
+  .g2048-cell[data-v="0"] { background: #1c1c2e; color: transparent; }
+  .g2048-cell[data-v="2"] { background: #2a2a4e; color: #aaa; }
+  .g2048-cell[data-v="4"] { background: #3a3a5e; color: #ccc; }
+  .g2048-cell[data-v="8"] { background: #5a4a7e; color: #ddd; }
+  .g2048-cell[data-v="16"] { background: var(--accent); color: white; }
+  .g2048-cell[data-v="32"] { background: #a855f7; color: white; }
+  .g2048-cell[data-v="64"] { background: var(--accent2); color: white; }
+  .g2048-cell[data-v="128"] { background: #ef4444; color: white; }
+  .g2048-cell[data-v="256"] { background: #f97316; color: white; }
+  .g2048-cell[data-v="512"] { background: #eab308; color: white; }
+  .g2048-cell[data-v="1024"] { background: var(--accent3); color: white; font-size: 10px; }
+  .g2048-cell[data-v="2048"] { background: #ffd700; color: #222; font-size: 10px; }
+
+  /* PDF viewer */
+  #pdf-frame { width: 100%; height: calc(100vh - 60px); border: none; background: #fff; }
+
+  /* Shared game controls */
+  .game-status { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 8px; }
+  .restart-btn {
+    display: inline-block; padding: 8px 16px; border-radius: 20px;
+    background: var(--accent); color: white; border: none;
+    font-family: var(--font); font-size: 11px; cursor: pointer; margin: 8px auto;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(108,99,255,0.3); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="screen active" id="home-screen">
+  <div class="home-header">
+    <div class="home-title">📱 MiApp</div>
+    <div class="home-sub">Apple Watch Edition</div>
+  </div>
+  <div class="home-grid">
+    <div class="home-card c1" onclick="showScreen('solucionarios-screen')">
+      <span class="icon">📄</span>
+      <span class="label">Solucionarios</span>
+    </div>
+    <div class="home-card c2" onclick="showScreen('valencias-screen')">
+      <span class="icon">⚗️</span>
+      <span class="label">Valencias</span>
+    </div>
+    <div class="home-card c3" onclick="showScreen('musica-screen')">
+      <span class="icon">🎵</span>
+      <span class="label">Música</span>
+    </div>
+    <div class="home-card c4" onclick="showScreen('juegos-screen')">
+      <span class="icon">🎮</span>
+      <span class="label">Juegos</span>
+    </div>
+  </div>
+</div>
+
+<!-- SOLUCIONARIOS -->
+<div class="screen" id="solucionarios-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">← Inicio</button>
+    <h1>Solucionarios</h1>
+  </div>
+  <div class="content">
+    <div class="btn-list">
+      <div class="btn-item" onclick="openPDF('docs/EnglishANS.pdf')">
+        <span class="bi">🇬🇧</span>
+        <div class="bt">
+          <div class="bt-title">Inglés</div>
+          <div class="bt-sub">EnglishANS.pdf</div>
+        </div>
+        <span class="arr">›</span>
+      </div>
+      <div class="btn-item" onclick="openPDF('docs/MatesANS.pdf')">
+        <span class="bi">📐</span>
+        <div class="bt">
+          <div class="bt-title">Matemáticas</div>
+          <div class="bt-sub">MatesANS.pdf</div>
+        </div>
+        <span class="arr">›</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PDF VIEWER -->
+<div class="screen" id="pdf-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('solucionarios-screen')">← Volver</button>
+    <h1 id="pdf-title">PDF</h1>
+  </div>
+  <iframe id="pdf-frame" src=""></iframe>
+</div>
+
+<!-- VALENCIAS -->
+<div class="screen" id="valencias-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">← Inicio</button>
+    <h1>Valencias</h1>
+  </div>
+  <div class="content">
+
+    <div class="handwritten-note">
+      <div class="hn-title">📝 Nota del apunte</div>
+      Cuando está en la derecha, actúa con valencia negativa.
+      <div class="prefix-list">
+        <span class="prefix-pill">Mono=1</span>
+        <span class="prefix-pill">Di=2</span>
+        <span class="prefix-pill">Tri=3</span>
+        <span class="prefix-pill">Tetra=4</span>
+        <span class="prefix-pill">Penta=5</span>
+        <span class="prefix-pill">Hexa=6</span>
+        <span class="prefix-pill">Hepta=7</span>
+      </div>
+    </div>
+
+    <!-- NO METALES -->
+    <div class="val-section">
+      <div class="val-section-title">⚡ No Metales</div>
+
+      <div class="val-group-title">Grupo 17 — Halógenos</div>
+      <table class="vtable">
+        <thead><tr><th>Elemento</th><th>Símbolo</th><th>Valencia(s)</th></tr></thead>
+        <tbody>
+          <tr><td>Flúor</td><td><span class="sym">F</span></td><td><span class="val-badge">-1</span></td></tr>
+          <tr><td>Cloro</td><td><span class="sym">Cl</span></td><td><span class="val-badge">-1</span> <span class="val-badge pos">+1</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+5</span> <span class="val-badge pos">+7</span></td></tr>
+          <tr><td>Bromo</td><td><span class="sym">Br</span></td><td><span class="val-badge">-1</span> <span class="val-badge pos">+1</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+5</span> <span class="val-badge pos">+7</span></td></tr>
+          <tr><td>Yodo</td><td><span class="sym">I</span></td><td><span class="val-badge">-1</span> <span class="val-badge pos">+1</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+5</span> <span class="val-badge pos">+7</span></td></tr>
+          <tr><td>Astato</td><td><span class="sym">At</span></td><td><span class="val-badge">-1</span> <span class="val-badge pos">+1</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+5</span> <span class="val-badge pos">+7</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="val-group-title">Grupo 16 — Anfígenos</div>
+      <table class="vtable">
+        <thead><tr><th>Elemento</th><th>Símbolo</th><th>Valencia(s)</th></tr></thead>
+        <tbody>
+          <tr><td>Oxígeno</td><td><span class="sym">O</span></td><td><span class="val-badge">-2</span></td></tr>
+          <tr><td>Azufre</td><td><span class="sym">S</span></td><td><span class="val-badge">-2</span> <span class="val-badge pos">+2</span> <span class="val-badge pos">+4</span> <span class="val-badge pos">+6</span></td></tr>
+          <tr><td>Selenio</td><td><span class="sym">Se</span></td><td><span class="val-badge">-2</span> <span class="val-badge pos">+2</span> <span class="val-badge pos">+4</span> <span class="val-badge pos">+6</span></td></tr>
+          <tr><td>Teluro</td><td><span class="sym">Te</span></td><td><span class="val-badge">-2</span> <span class="val-badge pos">+2</span> <span class="val-badge pos">+4</span> <span class="val-badge pos">+6</span></td></tr>
+          <tr><td>Hidrógeno</td><td><span class="sym">H</span></td><td><span class="val-badge">-1</span> <span class="val-badge pos">+1</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="val-group-title">Grupo 15 — Nitrogenoides</div>
+      <table class="vtable">
+        <thead><tr><th>Elemento</th><th>Símbolo</th><th>Valencia(s)</th></tr></thead>
+        <tbody>
+          <tr><td>Nitrógeno</td><td><span class="sym">N</span></td><td><span class="val-badge">-3</span> <span class="val-badge pos">+1</span> <span class="val-badge pos">+2</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+4</span> <span class="val-badge pos">+5</span></td></tr>
+          <tr><td>Fósforo</td><td><span class="sym">P</span></td><td><span class="val-badge">-3</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+5</span></td></tr>
+          <tr><td>Arsénico</td><td><span class="sym">As</span></td><td><span class="val-badge">-3</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+5</span></td></tr>
+          <tr><td>Antimonio</td><td><span class="sym">Sb</span></td><td><span class="val-badge">-3</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+5</span></td></tr>
+          <tr><td>Bismuto</td><td><span class="sym">Bi</span></td><td><span class="val-badge">-3</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+5</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="val-group-title">Grupo 14 — Carbonoides</div>
+      <table class="vtable">
+        <thead><tr><th>Elemento</th><th>Símbolo</th><th>Valencia(s)</th></tr></thead>
+        <tbody>
+          <tr><td>Carbono</td><td><span class="sym">C</span></td><td><span class="val-badge">-4</span> <span class="val-badge pos">+2</span> <span class="val-badge pos">+4</span></td></tr>
+          <tr><td>Silicio</td><td><span class="sym">Si</span></td><td><span class="val-badge">-4</span> <span class="val-badge pos">+4</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="val-group-title">Grupo 13 — Térreos</div>
+      <table class="vtable">
+        <thead><tr><th>Elemento</th><th>Símbolo</th><th>Valencia(s)</th></tr></thead>
+        <tbody>
+          <tr><td>Boro</td><td><span class="sym">B</span></td><td><span class="val-badge">-3</span> <span class="val-badge pos">+3</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- METALES -->
+    <div class="val-section">
+      <div class="val-section-title">🔩 Metales</div>
+
+      <div class="val-group-title">Grupo 1 — Alcalinos</div>
+      <table class="vtable">
+        <thead><tr><th>Elemento</th><th>Símbolo</th><th>Valencia</th></tr></thead>
+        <tbody>
+          <tr><td>Litio</td><td><span class="sym">Li</span></td><td><span class="val-badge pos">+1</span></td></tr>
+          <tr><td>Sodio</td><td><span class="sym">Na</span></td><td><span class="val-badge pos">+1</span></td></tr>
+          <tr><td>Potasio</td><td><span class="sym">K</span></td><td><span class="val-badge pos">+1</span></td></tr>
+          <tr><td>Rubidio</td><td><span class="sym">Rb</span></td><td><span class="val-badge pos">+1</span></td></tr>
+          <tr><td>Cesio</td><td><span class="sym">Cs</span></td><td><span class="val-badge pos">+1</span></td></tr>
+          <tr><td>Francio</td><td><span class="sym">Fr</span></td><td><span class="val-badge pos">+1</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="val-group-title">Grupo 2 — Alcalino-térreos</div>
+      <table class="vtable">
+        <thead><tr><th>Elemento</th><th>Símbolo</th><th>Valencia</th></tr></thead>
+        <tbody>
+          <tr><td>Berilio</td><td><span class="sym">Be</span></td><td><span class="val-badge pos">+2</span></td></tr>
+          <tr><td>Magnesio</td><td><span class="sym">Mg</span></td><td><span class="val-badge pos">+2</span></td></tr>
+          <tr><td>Calcio</td><td><span class="sym">Ca</span></td><td><span class="val-badge pos">+2</span></td></tr>
+          <tr><td>Estroncio</td><td><span class="sym">Sr</span></td><td><span class="val-badge pos">+2</span></td></tr>
+          <tr><td>Bario</td><td><span class="sym">Ba</span></td><td><span class="val-badge pos">+2</span></td></tr>
+          <tr><td>Radio</td><td><span class="sym">Ra</span></td><td><span class="val-badge pos">+2</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="val-group-title">Metales de transición — varios</div>
+      <table class="vtable">
+        <thead><tr><th>Elemento</th><th>Símbolo</th><th>Valencia(s)</th></tr></thead>
+        <tbody>
+          <tr><td>Mercurio</td><td><span class="sym">Hg</span></td><td><span class="val-badge pos">+1</span> <span class="val-badge pos">+2</span></td></tr>
+          <tr><td>Cobre</td><td><span class="sym">Cu</span></td><td><span class="val-badge pos">+1</span> <span class="val-badge pos">+2</span></td></tr>
+          <tr><td>Estaño</td><td><span class="sym">Sn</span></td><td><span class="val-badge pos">+2</span> <span class="val-badge pos">+4</span></td></tr>
+          <tr><td>Plomo</td><td><span class="sym">Pb</span></td><td><span class="val-badge pos">+2</span> <span class="val-badge pos">+4</span></td></tr>
+          <tr><td>Platino</td><td><span class="sym">Pt</span></td><td><span class="val-badge pos">+2</span> <span class="val-badge pos">+4</span></td></tr>
+          <tr><td>Paladio</td><td><span class="sym">Pd</span></td><td><span class="val-badge pos">+2</span> <span class="val-badge pos">+4</span></td></tr>
+          <tr><td>Oro</td><td><span class="sym">Au</span></td><td><span class="val-badge pos">+1</span> <span class="val-badge pos">+3</span></td></tr>
+          <tr><td>Plata</td><td><span class="sym">Ag</span></td><td><span class="val-badge pos">+1</span></td></tr>
+          <tr><td>Aluminio</td><td><span class="sym">Al</span></td><td><span class="val-badge pos">+3</span></td></tr>
+          <tr><td>Cinc</td><td><span class="sym">Zn</span></td><td><span class="val-badge pos">+2</span></td></tr>
+          <tr><td>Cadmio</td><td><span class="sym">Cd</span></td><td><span class="val-badge pos">+2</span></td></tr>
+          <tr><td>Hierro</td><td><span class="sym">Fe</span></td><td><span class="val-badge pos">+2</span> <span class="val-badge pos">+3</span></td></tr>
+          <tr><td>Cobalto</td><td><span class="sym">Co</span></td><td><span class="val-badge pos">+2</span> <span class="val-badge pos">+3</span></td></tr>
+          <tr><td>Níquel</td><td><span class="sym">Ni</span></td><td><span class="val-badge pos">+2</span> <span class="val-badge pos">+3</span></td></tr>
+          <tr><td>Manganeso*</td><td><span class="sym">Mn</span></td><td><span class="val-badge pos">+2</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+4</span> <span class="val-badge pos">+6</span> <span class="val-badge pos">+7</span></td></tr>
+          <tr><td>Cromo**</td><td><span class="sym">Cr</span></td><td><span class="val-badge pos">+2</span> <span class="val-badge pos">+3</span> <span class="val-badge pos">+6</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="note-text">* Manganeso actúa con +4, +6, +7 cuando actúa como No Metal</div>
+      <div class="note-text">** Cromo actúa con +6 cuando actúa como No Metal</div>
+    </div>
+
+    <!-- QUIZ BUTTON -->
+    <div style="padding: 4px 0 10px;">
+      <div class="btn-item" onclick="startQuiz()" style="background: rgba(108,99,255,0.1); border-color: rgba(108,99,255,0.5);">
+        <span class="bi">🧠</span>
+        <div class="bt">
+          <div class="bt-title">Test de Valencias</div>
+          <div class="bt-sub">¡Aprende todas las valencias!</div>
+        </div>
+        <span class="arr">›</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div class="screen" id="quiz-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('valencias-screen')">← Valencias</button>
+    <h1>Test Valencia</h1>
+  </div>
+  <div class="content" id="quiz-container">
+    <div class="quiz-header">
+      <span id="quiz-qnum" style="font-size:11px;color:var(--muted)">1/10</span>
+      <span class="quiz-score" id="quiz-score-display">✓ 0</span>
+    </div>
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-prog"></div></div>
+    <div class="quiz-question"><div class="quiz-q-text" id="quiz-q"></div></div>
+    <div class="quiz-options" id="quiz-opts"></div>
+    <div class="quiz-feedback" id="quiz-fb"></div>
+    <button class="quiz-next" id="quiz-next-btn" onclick="nextQuestion()">Siguiente →</button>
+    <div id="quiz-end" style="display:none;">
+      <div class="quiz-end">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Resultado final</div>
+        <div class="quiz-end-score" id="quiz-final-score"></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px" id="quiz-final-msg"></div>
+        <button class="quiz-restart" onclick="startQuiz()">Volver a jugar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MÚSICA -->
+<div class="screen" id="musica-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">← Inicio</button>
+    <h1>Música</h1>
+  </div>
+  <div class="content">
+    <div class="music-card">
+      <div class="music-song-title">Близкие люди</div>
+      <div class="music-artist">spotdown.org</div>
+
+      <div class="music-viz" id="music-viz">
+        <div class="music-bar" id="b1" style="height:6px;animation-delay:0s"></div>
+        <div class="music-bar" id="b2" style="height:12px;animation-delay:0.15s"></div>
+        <div class="music-bar" id="b3" style="height:8px;animation-delay:0.3s"></div>
+        <div class="music-bar" id="b4" style="height:16px;animation-delay:0.1s"></div>
+        <div class="music-bar" id="b5" style="height:10px;animation-delay:0.25s"></div>
+        <div class="music-bar" id="b6" style="height:14px;animation-delay:0.05s"></div>
+        <div class="music-bar" id="b7" style="height:7px;animation-delay:0.2s"></div>
+        <div class="music-bar" id="b8" style="height:20px;animation-delay:0.35s"></div>
+        <div class="music-bar" id="b9" style="height:9px;animation-delay:0.12s"></div>
+        <div class="music-bar" id="b10" style="height:13px;animation-delay:0.28s"></div>
+      </div>
+
+      <div class="music-progress">
+        <div class="prog-bar" onclick="seekAudio(event)" id="prog-bar">
+          <div class="prog-fill" id="prog-fill"></div>
+        </div>
+        <div class="prog-times">
+          <span id="cur-time">0:00</span>
+          <span id="tot-time">0:00</span>
+        </div>
+      </div>
+
+      <div class="music-controls">
+        <button class="ctrl-btn" onclick="skipTime(-10)">-10s</button>
+        <button class="ctrl-btn play-btn" id="play-btn" onclick="togglePlay()">▶</button>
+        <button class="ctrl-btn" onclick="skipTime(10)">+10s</button>
+      </div>
+
+      <div class="volume-row">
+        <span class="vol-icon" onclick="toggleMute()" id="vol-icon">🔊</span>
+        <input type="range" class="vol-slider" id="vol-slider" min="0" max="100" value="80" oninput="setVolume(this.value)">
+        <span style="font-size:10px;color:var(--muted);font-family:var(--mono)" id="vol-num">80%</span>
+      </div>
+    </div>
+
+    <audio id="audio-player" src="docs/Близкие люди_spotdown.org.mp3" preload="metadata"></audio>
+  </div>
+</div>
+
+<!-- JUEGOS HOME -->
+<div class="screen" id="juegos-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">← Inicio</button>
+    <h1>Juegos</h1>
+  </div>
+  <div class="content">
+    <div class="games-grid">
+      <div class="game-card gc1" onclick="showScreen('dino-screen')">
+        <div class="game-icon">🦕</div>
+        <div class="game-name">Dinosaurio</div>
+      </div>
+      <div class="game-card gc2" onclick="showScreen('snake-screen')">
+        <div class="game-icon">🐍</div>
+        <div class="game-name">Snake</div>
+      </div>
+      <div class="game-card gc3" onclick="showScreen('sudoku-screen')">
+        <div class="game-icon">🔢</div>
+        <div class="game-name">Sudoku</div>
+      </div>
+      <div class="game-card gc4" onclick="showScreen('memory-screen')">
+        <div class="game-icon">🃏</div>
+        <div class="game-name">Memory</div>
+      </div>
+      <div class="game-card gc5" onclick="showScreen('trivia-screen')">
+        <div class="game-icon">❓</div>
+        <div class="game-name">Trivia</div>
+      </div>
+      <div class="game-card gc6" onclick="showScreen('g2048-screen')">
+        <div class="game-icon">🟧</div>
+        <div class="game-name">2048</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DINOSAURIO -->
+<div class="screen" id="dino-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('juegos-screen')">← Juegos</button>
+    <h1>🦕 Dino</h1>
+  </div>
+  <div class="content">
+    <div style="text-align:center;margin-bottom:8px;">
+      <span style="font-family:var(--mono);font-size:14px;color:var(--accent)">Puntos: <span id="dino-score">0</span></span>
+    </div>
+    <div id="dino-canvas-wrap">
+      <canvas id="dino-canvas" width="320" height="140"></canvas>
+    </div>
+    <div id="dino-tap-hint">Toca la pantalla o pulsa espacio para saltar</div>
+  </div>
+</div>
+
+<!-- SNAKE -->
+<div class="screen" id="snake-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('juegos-screen');stopSnake()">← Juegos</button>
+    <h1>🐍 Snake</h1>
+  </div>
+  <div class="content">
+    <div id="snake-wrap">
+      <div class="snake-score">Puntos: <span id="snake-score">0</span></div>
+      <canvas id="snake-canvas" width="260" height="260"></canvas>
+      <div class="dpad" style="margin-top:10px;">
+        <div></div>
+        <div class="dpad-btn" ontouchstart="setDir(0,-1)">▲</div>
+        <div></div>
+        <div class="dpad-btn" ontouchstart="setDir(-1,0)">◀</div>
+        <div class="dpad-btn" style="font-size:10px;" ontouchstart="snakePause()">⏸</div>
+        <div class="dpad-btn" ontouchstart="setDir(1,0)">▶</div>
+        <div></div>
+        <div class="dpad-btn" ontouchstart="setDir(0,1)">▼</div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUDOKU -->
+<div class="screen" id="sudoku-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('juegos-screen')">← Juegos</button>
+    <h1>🔢 Sudoku</h1>
+  </div>
+  <div class="content">
+    <div class="sudoku-diff">
+      <button class="diff-btn active" onclick="setSudokuDiff('easy',this)">Fácil</button>
+      <button class="diff-btn" onclick="setSudokuDiff('medium',this)">Medio</button>
+      <button class="diff-btn" onclick="setSudokuDiff('hard',this)">Difícil</button>
+      <button class="diff-btn" onclick="setSudokuDiff('expert',this)">Experto</button>
+    </div>
+    <div class="sudoku-grid" id="sudoku-grid"></div>
+    <div class="sudoku-numpad" id="sudoku-numpad">
+      <button class="num-btn" onclick="inputNum(1)">1</button>
+      <button class="num-btn" onclick="inputNum(2)">2</button>
+      <button class="num-btn" onclick="inputNum(3)">3</button>
+      <button class="num-btn" onclick="inputNum(4)">4</button>
+      <button class="num-btn" onclick="inputNum(5)">5</button>
+      <button class="num-btn" onclick="inputNum(6)">6</button>
+      <button class="num-btn" onclick="inputNum(7)">7</button>
+      <button class="num-btn" onclick="inputNum(8)">8</button>
+      <button class="num-btn" onclick="inputNum(9)">9</button>
+      <button class="num-btn" onclick="inputNum(0)" style="color:var(--accent2)">✕</button>
+    </div>
+    <div class="sudoku-actions">
+      <button class="sudoku-act-btn" onclick="generateSudoku()">Nuevo</button>
+      <button class="sudoku-act-btn" onclick="checkSudoku()">Comprobar</button>
+    </div>
+    <div class="sudoku-win" id="sudoku-win">🎉 ¡Completado!</div>
+  </div>
+</div>
+
+<!-- MEMORY -->
+<div class="screen" id="memory-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('juegos-screen')">← Juegos</button>
+    <h1>🃏 Memory</h1>
+  </div>
+  <div class="content">
+    <div id="memory-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:11px;color:var(--muted)">Movimientos: <span id="mem-moves">0</span></span>
+        <span style="font-size:11px;color:var(--accent3)">Pares: <span id="mem-pairs">0</span>/8</span>
+      </div>
+      <div class="memory-grid" id="memory-grid"></div>
+      <div style="text-align:center;"><button class="restart-btn" onclick="initMemory()">Nuevo juego</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- TRIVIA -->
+<div class="screen" id="trivia-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('juegos-screen')">← Juegos</button>
+    <h1>❓ Trivia</h1>
+  </div>
+  <div class="content">
+    <div id="trivia-wrap">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:11px;color:var(--muted)" id="trivia-num">1/10</span>
+        <span class="trivia-score" id="trivia-score">✓ 0</span>
+      </div>
+      <div class="trivia-q" id="trivia-q"></div>
+      <div class="trivia-opts" id="trivia-opts"></div>
+      <button class="trivia-next" id="trivia-next" onclick="nextTrivia()">Siguiente →</button>
+      <div id="trivia-end" style="display:none;text-align:center;padding:20px;">
+        <div class="quiz-end-score" id="trivia-final"></div>
+        <button class="quiz-restart" onclick="initTrivia()">Repetir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2048 -->
+<div class="screen" id="g2048-screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="showScreen('juegos-screen')">← Juegos</button>
+    <h1>🟧 2048</h1>
+  </div>
+  <div class="content">
+    <div id="g2048-wrap">
+      <div id="g2048-score">Puntuación: 0</div>
+      <div class="g2048-grid" id="g2048-grid"></div>
+      <div style="display:flex;gap:8px;justify-content:center;">
+        <button class="restart-btn" onclick="init2048()">Nuevo</button>
+      </div>
+      <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:8px;">Desliza para mover</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== NAVIGATION =====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='dino-screen') initDino();
+  if(id==='snake-screen') initSnake();
+  if(id==='sudoku-screen') generateSudoku();
+  if(id==='memory-screen') initMemory();
+  if(id==='trivia-screen') initTrivia();
+  if(id==='g2048-screen') init2048();
+}
+function goHome() { showScreen('home-screen'); }
+
+// ===================== PDF =====================
+function openPDF(path) {
+  document.getElementById('pdf-frame').src = path;
+  document.getElementById('pdf-title').textContent = path.split('/').pop().replace('.pdf','');
+  showScreen('pdf-screen');
+}
+
+// ===================== VALENCIAS DATA =====================
+const valenciaData = [
+  {el:'Flúor', sym:'F', vals:['-1'], type:'No Metal'},
+  {el:'Cloro', sym:'Cl', vals:['-1','+1','+3','+5','+7'], type:'No Metal'},
+  {el:'Bromo', sym:'Br', vals:['-1','+1','+3','+5','+7'], type:'No Metal'},
+  {el:'Yodo', sym:'I', vals:['-1','+1','+3','+5','+7'], type:'No Metal'},
+  {el:'Astato', sym:'At', vals:['-1','+1','+3','+5','+7'], type:'No Metal'},
+  {el:'Oxígeno', sym:'O', vals:['-2'], type:'No Metal'},
+  {el:'Azufre', sym:'S', vals:['-2','+2','+4','+6'], type:'No Metal'},
+  {el:'Selenio', sym:'Se', vals:['-2','+2','+4','+6'], type:'No Metal'},
+  {el:'Teluro', sym:'Te', vals:['-2','+2','+4','+6'], type:'No Metal'},
+  {el:'Hidrógeno', sym:'H', vals:['-1','+1'], type:'No Metal'},
+  {el:'Nitrógeno', sym:'N', vals:['-3','+1','+2','+3','+4','+5'], type:'No Metal'},
+  {el:'Fósforo', sym:'P', vals:['-3','+3','+5'], type:'No Metal'},
+  {el:'Arsénico', sym:'As', vals:['-3','+3','+5'], type:'No Metal'},
+  {el:'Antimonio', sym:'Sb', vals:['-3','+3','+5'], type:'No Metal'},
+  {el:'Bismuto', sym:'Bi', vals:['-3','+3','+5'], type:'No Metal'},
+  {el:'Carbono', sym:'C', vals:['-4','+2','+4'], type:'No Metal'},
+  {el:'Silicio', sym:'Si', vals:['-4','+4'], type:'No Metal'},
+  {el:'Boro', sym:'B', vals:['-3','+3'], type:'No Metal'},
+  {el:'Litio', sym:'Li', vals:['+1'], type:'Metal'},
+  {el:'Sodio', sym:'Na', vals:['+1'], type:'Metal'},
+  {el:'Potasio', sym:'K', vals:['+1'], type:'Metal'},
+  {el:'Rubidio', sym:'Rb', vals:['+1'], type:'Metal'},
+  {el:'Cesio', sym:'Cs', vals:['+1'], type:'Metal'},
+  {el:'Francio', sym:'Fr', vals:['+1'], type:'Metal'},
+  {el:'Berilio', sym:'Be', vals:['+2'], type:'Metal'},
+  {el:'Magnesio', sym:'Mg', vals:['+2'], type:'Metal'},
+  {el:'Calcio', sym:'Ca', vals:['+2'], type:'Metal'},
+  {el:'Estroncio', sym:'Sr', vals:['+2'], type:'Metal'},
+  {el:'Bario', sym:'Ba', vals:['+2'], type:'Metal'},
+  {el:'Radio', sym:'Ra', vals:['+2'], type:'Metal'},
+  {el:'Mercurio', sym:'Hg', vals:['+1','+2'], type:'Metal'},
+  {el:'Cobre', sym:'Cu', vals:['+1','+2'], type:'Metal'},
+  {el:'Estaño', sym:'Sn', vals:['+2','+4'], type:'Metal'},
+  {el:'Plomo', sym:'Pb', vals:['+2','+4'], type:'Metal'},
+  {el:'Platino', sym:'Pt', vals:['+2','+4'], type:'Metal'},
+  {el:'Paladio', sym:'Pd', vals:['+2','+4'], type:'Metal'},
+  {el:'Oro', sym:'Au', vals:['+1','+3'], type:'Metal'},
+  {el:'Plata', sym:'Ag', vals:['+1'], type:'Metal'},
+  {el:'Aluminio', sym:'Al', vals:['+3'], type:'Metal'},
+  {el:'Cinc', sym:'Zn', vals:['+2'], type:'Metal'},
+  {el:'Cadmio', sym:'Cd', vals:['+2'], type:'Metal'},
+  {el:'Hierro', sym:'Fe', vals:['+2','+3'], type:'Metal'},
+  {el:'Cobalto', sym:'Co', vals:['+2','+3'], type:'Metal'},
+  {el:'Níquel', sym:'Ni', vals:['+2','+3'], type:'Metal'},
+  {el:'Manganeso', sym:'Mn', vals:['+2','+3','+4','+6','+7'], type:'Metal'},
+  {el:'Cromo', sym:'Cr', vals:['+2','+3','+6'], type:'Metal'},
+];
+
+// ===================== QUIZ =====================
+let quizQ=0, quizScore=0, quizTotal=10, quizQuestions=[], quizAnswered=false;
+
+function makeQuizQuestions() {
+  const types=['elem2sym','sym2val','elem2val','val2elem'];
+  const q=[];
+  const shuffled=[...valenciaData].sort(()=>Math.random()-0.5);
+  for(let i=0;i<quizTotal;i++){
+    const d=shuffled[i%shuffled.length];
+    const type=types[Math.floor(Math.random()*types.length)];
+    q.push({data:d,type});
+  }
+  return q;
+}
+
+function startQuiz() {
+  quizQ=0; quizScore=0; quizAnswered=false;
+  quizQuestions=makeQuizQuestions();
+  document.getElementById('quiz-end').style.display='none';
+  document.getElementById('quiz-opts').style.display='grid';
+  document.getElementById('quiz-q').parentElement.style.display='flex';
+  document.querySelector('.quiz-progress-bar').style.display='block';
+  document.querySelector('.quiz-header').style.display='flex';
+  showScreen('quiz-screen');
+  renderQuizQ();
+}
+
+function renderQuizQ(){
+  if(quizQ>=quizTotal){endQuiz();return;}
+  quizAnswered=false;
+  const q=quizQuestions[quizQ];
+  const d=q.data;
+  document.getElementById('quiz-qnum').textContent=`${quizQ+1}/${quizTotal}`;
+  document.getElementById('quiz-score-display').textContent=`✓ ${quizScore}`;
+  document.getElementById('quiz-prog').style.width=`${(quizQ/quizTotal)*100}%`;
+  document.getElementById('quiz-fb').className='quiz-feedback';
+  document.getElementById('quiz-next-btn').className='quiz-next';
+
+  let qText='', correct='', opts=[];
+  const allVals=valenciaData.flatMap(x=>x.vals);
+  const uniqVals=[...new Set(allVals)];
+
+  if(q.type==='elem2sym'){
+    qText=`¿Cuál es el símbolo de <span class="quiz-element">${d.el}</span>?`;
+    correct=d.sym;
+    const wrong=[...valenciaData].filter(x=>x.sym!==d.sym).sort(()=>Math.random()-0.5).slice(0,3).map(x=>x.sym);
+    opts=[correct,...wrong].sort(()=>Math.random()-0.5);
+  } else if(q.type==='sym2val'){
+    qText=`El elemento <span class="quiz-element">${d.sym}</span> (${d.el}), ¿cuál es su valencia principal?`;
+    correct=d.vals[0];
+    const wrong=uniqVals.filter(v=>!d.vals.includes(v)).sort(()=>Math.random()-0.5).slice(0,3);
+    opts=[correct,...wrong].sort(()=>Math.random()-0.5);
+  } else if(q.type==='elem2val'){
+    qText=`¿Cuántas valencias tiene el <span class="quiz-element">${d.el}</span>?`;
+    correct=String(d.vals.length);
+    const nums=['1','2','3','4','5','6'].filter(n=>n!==correct);
+    const wrong=nums.sort(()=>Math.random()-0.5).slice(0,3);
+    opts=[correct,...wrong].sort(()=>Math.random()-0.5);
+  } else {
+    const v=d.vals[Math.floor(Math.random()*d.vals.length)];
+    qText=`¿Qué elemento tiene la valencia <span class="quiz-element">${v}</span>? (entre estos)`;
+    correct=d.el;
+    const wrong=[...valenciaData].filter(x=>x.el!==d.el).sort(()=>Math.random()-0.5).slice(0,3).map(x=>x.el);
+    opts=[correct,...wrong].sort(()=>Math.random()-0.5);
+  }
+
+  document.getElementById('quiz-q').innerHTML=qText;
+  const optsDiv=document.getElementById('quiz-opts');
+  optsDiv.innerHTML='';
+  opts.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='quiz-opt';
+    btn.textContent=o;
+    btn.onclick=()=>answerQuiz(o,correct,btn);
+    optsDiv.appendChild(btn);
+  });
+}
+
+function answerQuiz(ans, correct, btn){
+  if(quizAnswered)return;
+  quizAnswered=true;
+  const fb=document.getElementById('quiz-fb');
+  if(ans===correct){
+    quizScore++;
+    btn.classList.add('correct');
+    fb.textContent='¡Correcto! ✓';
+    fb.className='quiz-feedback show ok';
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.quiz-opt').forEach(b=>{if(b.textContent===correct)b.classList.add('correct');});
+    fb.textContent=`Incorrecto. Era: ${correct}`;
+    fb.className='quiz-feedback show ko';
+  }
+  document.getElementById('quiz-next-btn').className='quiz-next show';
+}
+
+function nextQuestion(){quizQ++;renderQuizQ();}
+
+function endQuiz(){
+  document.getElementById('quiz-opts').style.display='none';
+  document.getElementById('quiz-q').parentElement.style.display='none';
+  document.querySelector('.quiz-progress-bar').style.display='none';
+  document.getElementById('quiz-fb').className='quiz-feedback';
+  document.getElementById('quiz-next-btn').className='quiz-next';
+  document.getElementById('quiz-end').style.display='block';
+  document.getElementById('quiz-final-score').textContent=`${quizScore}/${quizTotal}`;
+  const pct=quizScore/quizTotal;
+  let msg=pct>=0.9?'🏆 ¡Excelente!':pct>=0.7?'👍 ¡Muy bien!':pct>=0.5?'😊 Sigue practicando':'📚 ¡A estudiar más!';
+  document.getElementById('quiz-final-msg').textContent=msg;
+}
+
+// ===================== MUSIC =====================
+const audio=document.getElementById('audio-player');
+let isMuted=false;
+
+function togglePlay(){
+  const btn=document.getElementById('play-btn');
+  const bars=document.querySelectorAll('.music-bar');
+  if(audio.paused){
+    audio.play().catch(()=>{});
+    btn.textContent='⏸';
+    bars.forEach(b=>b.classList.add('playing'));
+  } else {
+    audio.pause();
+    btn.textContent='▶';
+    bars.forEach(b=>b.classList.remove('playing'));
+  }
+}
+
+function skipTime(s){audio.currentTime=Math.max(0,Math.min(audio.duration||0,audio.currentTime+s));}
+
+function toggleMute(){
+  isMuted=!isMuted;
+  audio.muted=isMuted;
+  document.getElementById('vol-icon').textContent=isMuted?'🔇':'🔊';
+}
+
+function setVolume(v){
+  audio.volume=v/100;
+  document.getElementById('vol-num').textContent=v+'%';
+  if(v==0){document.getElementById('vol-icon').textContent='🔇';}
+  else{document.getElementById('vol-icon').textContent='🔊';}
+}
+
+function seekAudio(e){
+  const bar=document.getElementById('prog-bar');
+  const r=bar.getBoundingClientRect();
+  const pct=(e.clientX-r.left)/r.width;
+  audio.currentTime=pct*(audio.duration||0);
+}
+
+function fmtTime(s){s=Math.floor(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+
+audio.addEventListener('timeupdate',()=>{
+  const pct=(audio.duration?audio.currentTime/audio.duration:0)*100;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('cur-time').textContent=fmtTime(audio.currentTime);
+});
+audio.addEventListener('loadedmetadata',()=>{document.getElementById('tot-time').textContent=fmtTime(audio.duration);});
+audio.addEventListener('ended',()=>{
+  document.getElementById('play-btn').textContent='▶';
+  document.querySelectorAll('.music-bar').forEach(b=>b.classList.remove('playing'));
+  document.getElementById('prog-fill').style.width='0%';
+});
+
+// ===================== DINO GAME =====================
+let dinoGame={running:false,frame:null};
+
+function initDino(){
+  const canvas=document.getElementById('dino-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=320,H=140;
+  let dino={x:40,y:H-30,vy:0,on:true,w:20,h:28};
+  let obs=[],speed=3,frame=0,score=0,alive=true,started=false;
+  const ground=H-10;
+
+  if(dinoGame.frame) cancelAnimationFrame(dinoGame.frame);
+  document.getElementById('dino-score').textContent='0';
+
+  function jump(){if(!started){started=true;}if(dino.on){dino.vy=-10;dino.on=false;}}
+  canvas.ontouchstart=e=>{e.preventDefault();jump();};
+  document.onkeydown=e=>{if(e.code==='Space'&&document.getElementById('dino-screen').classList.contains('active')){e.preventDefault();jump();}};
+
+  function reset(){
+    dino={x:40,y:H-30,vy:0,on:true,w:20,h:28};
+    obs=[];speed=3;frame=0;score=0;alive=true;started=false;
+    document.getElementById('dino-score').textContent='0';
+  }
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#1a1a2a';
+    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(108,99,255,0.3)';
+    ctx.fillRect(0,ground,W,2);
+
+    if(!started){
+      ctx.fillStyle='#888';
+      ctx.font='12px DM Mono';
+      ctx.textAlign='center';
+      ctx.fillText('Toca para empezar',W/2,H/2);
+      ctx.textAlign='left';
+    }
+
+    if(started && alive){
+      frame++;
+      score=Math.floor(frame/6);
+      document.getElementById('dino-score').textContent=score;
+      speed=3+score*0.003;
+
+      dino.vy+=0.6;
+      dino.y+=dino.vy;
+      if(dino.y>=ground-dino.h){dino.y=ground-dino.h;dino.vy=0;dino.on=true;}
+
+      if(frame%Math.max(60,90-score/2)===0){
+        obs.push({x:W,y:ground-30,w:14,h:30});
+      }
+      obs.forEach(o=>o.x-=speed);
+      obs=obs.filter(o=>o.x>-20);
+
+      for(let o of obs){
+        if(dino.x+dino.w-4>o.x+2&&dino.x+4<o.x+o.w&&dino.y+4<o.y+o.h&&dino.y+dino.h-4>o.y){
+          alive=false;
+        }
+      }
+    }
+
+    // Draw dino
+    ctx.fillStyle=alive?'#6c63ff':'#ff6584';
+    ctx.fillRect(dino.x,dino.y,dino.w,dino.h);
+    ctx.fillStyle='#fff';
+    ctx.fillRect(dino.x+12,dino.y+4,5,5);
+
+    // Draw cactus
+    obs.forEach(o=>{
+      ctx.fillStyle='#43e97b';
+      ctx.fillRect(o.x,o.y,o.w,o.h);
+    });
+
+    if(!alive){
+      ctx.fillStyle='rgba(0,0,0,0.6)';
+      ctx.fillRect(0,0,W,H);
+      ctx.fillStyle='#ff6584';
+      ctx.font='bold 14px DM Sans';
+      ctx.textAlign='center';
+      ctx.fillText('Game Over — Toca para reiniciar',W/2,H/2-10);
+      ctx.fillStyle='#888';
+      ctx.font='11px DM Mono';
+      ctx.fillText('Puntos: '+score,W/2,H/2+10);
+      ctx.textAlign='left';
+      canvas.ontouchstart=e=>{e.preventDefault();reset();};
+    }
+
+    dinoGame.frame=requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ===================== SNAKE =====================
+let snakeInterval=null;
+let snakeState={};
+
+function initSnake(){
+  const canvas=document.getElementById('snake-canvas');
+  const ctx=canvas.getContext('2d');
+  const COLS=20,ROWS=20,SZ=13;
+  let snake=[{x:10,y:10}],dir={x:1,y:0},food={},score=0,alive=true,paused=false;
+
+  function placeFood(){
+    do{food={x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)};}
+    while(snake.some(s=>s.x===food.x&&s.y===food.y));
+  }
+  placeFood();
+  document.getElementById('snake-score').textContent='0';
+
+  function draw(){
+    ctx.fillStyle='#111';
+    ctx.fillRect(0,0,COLS*SZ,ROWS*SZ);
+    snake.forEach((s,i)=>{
+      ctx.fillStyle=i===0?'#6c63ff':'rgba(108,99,255,0.6)';
+      ctx.fillRect(s.x*SZ+1,s.y*SZ+1,SZ-2,SZ-2);
+    });
+    ctx.fillStyle='#ff6584';
+    ctx.beginPath();
+    ctx.arc(food.x*SZ+SZ/2,food.y*SZ+SZ/2,SZ/2-1,0,Math.PI*2);
+    ctx.fill();
+    if(!alive){
+      ctx.fillStyle='rgba(0,0,0,0.6)';
+      ctx.fillRect(0,0,COLS*SZ,ROWS*SZ);
+      ctx.fillStyle='#ff6584';
+      ctx.font='bold 13px DM Sans';
+      ctx.textAlign='center';
+      ctx.fillText('Game Over',COLS*SZ/2,ROWS*SZ/2);
+      ctx.textAlign='left';
+    }
+  }
+
+  function step(){
+    if(!alive||paused)return;
+    const head={x:(snake[0].x+dir.x+COLS)%COLS,y:(snake[0].y+dir.y+ROWS)%ROWS};
+    if(snake.some(s=>s.x===head.x&&s.y===head.y)){alive=false;draw();return;}
+    snake.unshift(head);
+    if(head.x===food.x&&head.y===food.y){score++;document.getElementById('snake-score').textContent=score;placeFood();}
+    else snake.pop();
+    draw();
+  }
+
+  window.setDir=function(dx,dy){if(dx!==0&&dir.x!==0)return;if(dy!==0&&dir.y!==0)return;dir={x:dx,y:dy};};
+  window.snakePause=function(){paused=!paused;};
+  window.stopSnake=function(){clearInterval(snakeInterval);};
+
+  clearInterval(snakeInterval);
+  snakeInterval=setInterval(step,140);
+  draw();
+}
+function stopSnake(){clearInterval(snakeInterval);}
+
+// ===================== SUDOKU =====================
+let sudokuDiff='easy', sudokuPuzzle=[], sudokuSolution=[], sudokuSelected=-1;
+
+function setSudokuDiff(d,btn){
+  sudokuDiff=d;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  generateSudoku();
+}
+
+function generateSudoku(){
+  document.getElementById('sudoku-win').classList.remove('show');
+  const sol=solveSudokuBase();
+  sudokuSolution=[...sol.map(r=>[...r])];
+  const removed={easy:30,medium:40,hard:50,expert:58}[sudokuDiff]||35;
+  const puz=sol.map(r=>[...r]);
+  let count=0;
+  while(count<removed){
+    const r=Math.floor(Math.random()*9),c=Math.floor(Math.random()*9);
+    if(puz[r][c]!==0){puz[r][c]=0;count++;}
+  }
+  sudokuPuzzle=puz;
+  sudokuSelected=-1;
+  renderSudoku();
+}
+
+function solveSudokuBase(){
+  const b=Array.from({length:9},()=>Array(9).fill(0));
+  fillBoard(b);
+  return b;
+}
+
+function fillBoard(b){
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++){
+    if(b[r][c]===0){
+      const nums=[1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5);
+      for(let n of nums){
+        if(canPlace(b,r,c,n)){b[r][c]=n;if(fillBoard(b))return true;b[r][c]=0;}
+      }
+      return false;
+    }
+  }
+  return true;
+}
+
+function canPlace(b,r,c,n){
+  for(let i=0;i<9;i++){if(b[r][i]===n||b[i][c]===n)return false;}
+  const br=Math.floor(r/3)*3,bc=Math.floor(c/3)*3;
+  for(let i=0;i<3;i++)for(let j=0;j<3;j++){if(b[br+i][bc+j]===n)return false;}
+  return true;
+}
+
+function renderSudoku(){
+  const grid=document.getElementById('sudoku-grid');
+  grid.innerHTML='';
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++){
+    const idx=r*9+c;
+    const cell=document.createElement('div');
+    cell.className='sudoku-cell'+(sudokuPuzzle[r][c]!==0?' given':'')+(idx===sudokuSelected?' selected':'');
+    cell.textContent=sudokuPuzzle[r][c]||'';
+    cell.dataset.idx=idx;
+    if(sudokuPuzzle[r][c]===0) cell.onclick=()=>{
+      sudokuSelected=idx;
+      document.querySelectorAll('.sudoku-cell').forEach(c2=>c2.classList.remove('selected'));
+      cell.classList.add('selected');
+    };
+    grid.appendChild(cell);
+  }
+}
+
+function inputNum(n){
+  if(sudokuSelected<0)return;
+  const r=Math.floor(sudokuSelected/9),c=sudokuSelected%9;
+  if(sudokuPuzzle[r][c]!==0&&document.querySelector(`.sudoku-cell[data-idx="${sudokuSelected}"]`).classList.contains('given'))return;
+  sudokuPuzzle[r][c]=n;
+  renderSudoku();
+  checkComplete();
+}
+
+function checkSudoku(){
+  const cells=document.querySelectorAll('.sudoku-cell');
+  cells.forEach((cell,idx)=>{
+    const r=Math.floor(idx/9),c=idx%9;
+    cell.classList.remove('error','correct');
+    if(sudokuPuzzle[r][c]!==0){
+      if(sudokuPuzzle[r][c]===sudokuSolution[r][c])cell.classList.add('correct');
+      else if(!cell.classList.contains('given'))cell.classList.add('error');
+    }
+  });
+}
+
+function checkComplete(){
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++){
+    if(sudokuPuzzle[r][c]!==sudokuSolution[r][c])return;
+  }
+  document.getElementById('sudoku-win').classList.add('show');
+}
+
+// ===================== MEMORY =====================
+const memEmojis=['🌟','🎯','🚀','🌈','🎵','🦋','🔥','💎'];
+let memFlipped=[],memMatched=0,memMoves=0,memLock=false;
+
+function initMemory(){
+  memFlipped=[];memMatched=0;memMoves=0;memLock=false;
+  document.getElementById('mem-moves').textContent='0';
+  document.getElementById('mem-pairs').textContent='0';
+  const cards=[...memEmojis,...memEmojis].sort(()=>Math.random()-0.5);
+  const grid=document.getElementById('memory-grid');
+  grid.innerHTML='';
+  cards.forEach((e,i)=>{
+    const card=document.createElement('div');
+    card.className='mem-card';
+    card.dataset.emoji=e;
+    card.dataset.idx=i;
+    card.innerHTML=`<span class="face">${e}</span>`;
+    card.onclick=()=>flipCard(card);
+    grid.appendChild(card);
+  });
+}
+
+function flipCard(card){
+  if(memLock||card.classList.contains('revealed')||card.classList.contains('matched'))return;
+  card.classList.add('revealed');
+  memFlipped.push(card);
+  if(memFlipped.length===2){
+    memLock=true;memMoves++;
+    document.getElementById('mem-moves').textContent=memMoves;
+    if(memFlipped[0].dataset.emoji===memFlipped[1].dataset.emoji){
+      memFlipped.forEach(c=>c.classList.add('matched'));
+      memMatched++;document.getElementById('mem-pairs').textContent=memMatched;
+      memFlipped=[];memLock=false;
+    } else {
+      setTimeout(()=>{
+        memFlipped.forEach(c=>c.classList.remove('revealed'));
+        memFlipped=[];memLock=false;
+      },900);
+    }
+  }
+}
+
+// ===================== TRIVIA =====================
+const triviaQuestions=[
+  {q:'¿Cuántos planetas tiene el Sistema Solar?',opts:['8','9','7','10'],a:0},
+  {q:'¿Cuál es la capital de Francia?',opts:['Roma','Madrid','París','Berlín'],a:2},
+  {q:'¿Cuánto es la raíz cuadrada de 144?',opts:['11','12','13','14'],a:1},
+  {q:'¿Cuál es el elemento más abundante en el universo?',opts:['Oxígeno','Carbono','Hidrógeno','Helio'],a:2},
+  {q:'¿En qué año llegó el hombre a la Luna?',opts:['1965','1967','1969','1971'],a:2},
+  {q:'¿Cuántos huesos tiene el cuerpo humano adulto?',opts:['186','206','226','246'],a:1},
+  {q:'¿Cuál es el océano más grande?',opts:['Atlántico','Índico','Ártico','Pacífico'],a:3},
+  {q:'¿Cuántos lados tiene un hexágono?',opts:['5','6','7','8'],a:1},
+  {q:'¿Qué gas necesitan las plantas para la fotosíntesis?',opts:['Oxígeno','Nitrógeno','CO₂','Argón'],a:2},
+  {q:'¿Cuál es el número π redondeado a 2 decimales?',opts:['3.14','3.16','3.12','3.18'],a:0},
+  {q:'¿Cuántos colores tiene el arcoíris?',opts:['5','6','7','8'],a:2},
+  {q:'¿Cuál es la montaña más alta del mundo?',opts:['K2','Everest','Kangchenjunga','Lhotse'],a:1},
+  {q:'¿Cuántos segundos tiene una hora?',opts:['3000','3200','3600','4000'],a:2},
+  {q:'¿Cuál es el símbolo del oro?',opts:['Go','Ag','Au','Or'],a:2},
+  {q:'¿Cuántos continentes hay en la Tierra?',opts:['5','6','7','8'],a:2},
+];
+
+let triviaIdx=0,triviaScore=0,triviaAnswered=false,triviaQs=[];
+
+function initTrivia(){
+  triviaIdx=0;triviaScore=0;triviaAnswered=false;
+  triviaQs=[...triviaQuestions].sort(()=>Math.random()-0.5).slice(0,10);
+  document.getElementById('trivia-end').style.display='none';
+  document.getElementById('trivia-q').style.display='block';
+  document.getElementById('trivia-opts').style.display='flex';
+  document.getElementById('trivia-score').textContent='✓ 0';
+  renderTrivia();
+}
+
+function renderTrivia(){
+  if(triviaIdx>=triviaQs.length){
+    document.getElementById('trivia-end').style.display='block';
+    document.getElementById('trivia-q').style.display='none';
+    document.getElementById('trivia-opts').style.display='none';
+    document.getElementById('trivia-next').className='trivia-next';
+    document.getElementById('trivia-final').textContent=`${triviaScore}/${triviaQs.length}`;
+    return;
+  }
+  triviaAnswered=false;
+  const q=triviaQs[triviaIdx];
+  document.getElementById('trivia-num').textContent=`${triviaIdx+1}/${triviaQs.length}`;
+  document.getElementById('trivia-q').textContent=q.q;
+  document.getElementById('trivia-next').className='trivia-next';
+  const opts=document.getElementById('trivia-opts');
+  opts.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const btn=document.createElement('div');
+    btn.className='trivia-opt';
+    btn.textContent=o;
+    btn.onclick=()=>{
+      if(triviaAnswered)return;
+      triviaAnswered=true;
+      if(i===q.a){triviaScore++;document.getElementById('trivia-score').textContent='✓ '+triviaScore;btn.classList.add('correct');}
+      else{btn.classList.add('wrong');opts.children[q.a].classList.add('correct');}
+      document.getElementById('trivia-next').className='trivia-next show';
+    };
+    opts.appendChild(btn);
+  });
+}
+
+function nextTrivia(){triviaIdx++;renderTrivia();}
+
+// ===================== 2048 =====================
+let board2048=[],score2048=0;
+
+function init2048(){
+  board2048=Array.from({length:4},()=>Array(4).fill(0));
+  score2048=0;
+  addTile2048();addTile2048();
+  render2048();
+}
+
+function addTile2048(){
+  const empty=[];
+  for(let r=0;r<4;r++)for(let c=0;c<4;c++){if(board2048[r][c]===0)empty.push([r,c]);}
+  if(empty.length===0)return;
+  const [r,c]=empty[Math.floor(Math.random()*empty.length)];
+  board2048[r][c]=Math.random()<0.9?2:4;
+}
+
+function render2048(){
+  const grid=document.getElementById('g2048-grid');
+  grid.innerHTML='';
+  board2048.flat().forEach(v=>{
+    const cell=document.createElement('div');
+    cell.className='g2048-cell';
+    cell.dataset.v=v;
+    cell.textContent=v||'';
+    grid.appendChild(cell);
+  });
+  document.getElementById('g2048-score').textContent='Puntuación: '+score2048;
+}
+
+function slide2048(row){
+  let r=row.filter(x=>x);
+  for(let i=0;i<r.length-1;i++){
+    if(r[i]===r[i+1]){score2048+=r[i]*2;r[i]*=2;r[i+1]=0;}
+  }
+  r=r.filter(x=>x);
+  while(r.length<4)r.push(0);
+  return r;
+}
+
+function move2048(dir){
+  let moved=false;
+  const prev=JSON.stringify(board2048);
+  if(dir==='left'){board2048=board2048.map(r=>slide2048(r));}
+  else if(dir==='right'){board2048=board2048.map(r=>slide2048(r.reverse()).reverse());}
+  else if(dir==='up'){
+    for(let c=0;c<4;c++){let col=board2048.map(r=>r[c]);col=slide2048(col);col.forEach((v,r)=>board2048[r][c]=v);}
+  }
+  else if(dir==='down'){
+    for(let c=0;c<4;c++){let col=board2048.map(r=>r[c]).reverse();col=slide2048(col).reverse();col.forEach((v,r)=>board2048[r][c]=v);}
+  }
+  if(JSON.stringify(board2048)!==prev){addTile2048();}
+  render2048();
+}
+
+// Swipe for 2048
+let t2x=0,t2y=0;
+document.getElementById('g2048-screen').addEventListener('touchstart',e=>{
+  const t=e.touches[0];t2x=t.clientX;t2y=t.clientY;
+},{passive:true});
+document.getElementById('g2048-screen').addEventListener('touchend',e=>{
+  if(!document.getElementById('g2048-screen').classList.contains('active'))return;
+  const t=e.changedTouches[0];
+  const dx=t.clientX-t2x,dy=t.clientY-t2y;
+  if(Math.abs(dx)<20&&Math.abs(dy)<20)return;
+  if(Math.abs(dx)>Math.abs(dy)){move2048(dx>0?'right':'left');}
+  else{move2048(dy>0?'down':'up');}
+},{passive:true});
+
+// Keyboard for 2048 and dino
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('g2048-screen').classList.contains('active')){
+    const map={'ArrowLeft':'left','ArrowRight':'right','ArrowUp':'up','ArrowDown':'down'};
+    if(map[e.key]){e.preventDefault();move2048(map[e.key]);}
+  }
+});
+</script>
+</body>
+</html>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -46,14 +45,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .btn-item .bt-sub{font-size:11px;color:var(--muted);margin-top:2px;}
 .btn-item .arr{color:var(--muted);font-size:16px;}
 /* PDF */
-#pdf-screen .content{padding:0;background:#333;overflow:hidden;}
-#pdf-toolbar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap;}
-#pdf-toolbar button{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 11px;border-radius:8px;font-size:12px;font-family:var(--font);cursor:pointer;}
+#pdf-screen .content{padding:0;background:#2a2a2a;overflow:hidden;display:flex;flex-direction:column;}
+#pdf-toolbar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
+#pdf-toolbar button{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 13px;border-radius:8px;font-size:13px;font-family:var(--font);cursor:pointer;font-weight:500;}
 #pdf-toolbar button:active{opacity:0.7;}
-#pdf-page-info{font-size:12px;color:var(--muted);font-family:var(--mono);flex:1;text-align:center;}
-#pdf-canvas-wrap{overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:8px 4px;gap:8px;background:#333;height:calc(100vh - 110px);}
-.pdf-page-canvas{display:block;max-width:100%;border-radius:4px;}
-#pdf-loading{color:var(--muted);font-size:13px;padding:30px;text-align:center;}
+#pdf-page-info{font-size:13px;color:var(--muted);font-family:var(--mono);flex:1;text-align:center;}
+#pdf-canvas-wrap{flex:1;overflow-y:auto;overflow-x:hidden;background:#2a2a2a;display:flex;flex-direction:column;align-items:center;padding:6px;}
 /* VALENCIAS */
 .val-section{margin-bottom:18px;}
 .val-section-title{font-size:13px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--accent);padding:10px 0 8px;border-bottom:1px solid var(--border);margin-bottom:10px;}
@@ -150,12 +147,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .sudoku-diff{display:flex;gap:6px;margin-bottom:10px;justify-content:center;flex-wrap:wrap;}
 .diff-btn{padding:7px 11px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-size:11px;font-family:var(--font);cursor:pointer;font-weight:500;}
 .diff-btn.active{background:var(--accent);border-color:var(--accent);color:white;}
-.sudoku-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:1px;background:rgba(108,99,255,0.3);border:2px solid rgba(108,99,255,0.4);border-radius:8px;overflow:hidden;width:100%;max-width:320px;margin:0 auto;}
-.sudoku-cell{background:var(--bg2);aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;font-family:var(--mono);font-weight:500;cursor:pointer;border:none;color:var(--text);}
-.sudoku-cell.given{color:var(--accent);font-weight:600;cursor:default;}
-.sudoku-cell.selected{background:rgba(108,99,255,0.2);}
-.sudoku-cell.cerror{background:rgba(255,101,132,0.15);color:var(--accent2);}
-.sudoku-cell.ccorrect{background:rgba(67,233,123,0.1);}
+.sudoku-grid{display:grid;grid-template-columns:repeat(9,1fr);background:var(--bg2);border:3px solid rgba(108,99,255,0.85);border-radius:8px;overflow:hidden;width:100%;max-width:320px;margin:0 auto;}
+.sudoku-cell{background:var(--bg2);aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;font-family:var(--mono);font-weight:500;cursor:pointer;color:var(--text);border-right:1px solid rgba(108,99,255,0.18);border-bottom:1px solid rgba(108,99,255,0.18);}
+.sudoku-cell.given{color:var(--accent);font-weight:700;cursor:default;}
+.sudoku-cell.selected{background:rgba(108,99,255,0.22);}
+.sudoku-cell.cerror{background:rgba(255,101,132,0.18);color:var(--accent2);}
+.sudoku-cell.ccorrect{background:rgba(67,233,123,0.12);}
+.sudoku-cell.bx-r{border-right:3px solid rgba(108,99,255,0.85);}
+.sudoku-cell.bx-b{border-bottom:3px solid rgba(108,99,255,0.85);}
+.sudoku-cell.no-r{border-right:none;}
+.sudoku-cell.no-b{border-bottom:none;}
 .sudoku-numpad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px auto;max-width:320px;}
 .num-btn{padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:15px;cursor:pointer;text-align:center;}
 .num-btn:active{background:rgba(108,99,255,0.2);}
@@ -222,9 +223,30 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <div class="screen" id="solucionarios-screen">
   <div class="topbar"><button class="back-btn" onclick="goHome()">← Inicio</button><h1>Solucionarios</h1></div>
   <div class="content">
+    <div style="background:rgba(255,200,80,0.08);border:1px solid rgba(255,200,80,0.3);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:rgba(255,200,80,0.9);line-height:1.5;">
+      ⌚ <b>Apple Watch:</b> usa el botón <b>Abrir PDF</b> (abre el archivo directamente). El lector integrado funciona mejor en iPhone.
+    </div>
     <div class="btn-list">
-      <div class="btn-item" onclick="openPDF('docs/EnglishANS.pdf','Inglés')"><span class="bi">🇬🇧</span><div class="bt"><div class="bt-title">Inglés</div><div class="bt-sub">EnglishANS.pdf</div></div><span class="arr">›</span></div>
-      <div class="btn-item" onclick="openPDF('docs/MatesANS.pdf','Matemáticas')"><span class="bi">📐</span><div class="bt"><div class="bt-title">Matemáticas</div><div class="bt-sub">MatesANS.pdf</div></div><span class="arr">›</span></div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:4px;">
+        <div style="padding:14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);">
+          <span style="font-size:20px;">🇬🇧</span>
+          <div style="flex:1;"><div style="font-size:14px;font-weight:500;">Inglés</div><div style="font-size:11px;color:var(--muted);">EnglishANS.pdf</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;">
+          <button onclick="openPDF('docs/EnglishANS.pdf','Inglés')" style="padding:12px;background:rgba(108,99,255,0.12);border:none;border-right:1px solid var(--border);color:var(--accent);font-family:var(--font);font-size:13px;cursor:pointer;font-weight:500;">📖 Lector</button>
+          <a href="docs/EnglishANS.pdf" target="_blank" style="padding:12px;background:rgba(67,233,123,0.08);border:none;color:var(--accent3);font-family:var(--font);font-size:13px;cursor:pointer;font-weight:500;text-align:center;text-decoration:none;display:block;">🔗 Abrir PDF</a>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+        <div style="padding:14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);">
+          <span style="font-size:20px;">📐</span>
+          <div style="flex:1;"><div style="font-size:14px;font-weight:500;">Matemáticas</div><div style="font-size:11px;color:var(--muted);">MatesANS.pdf</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;">
+          <button onclick="openPDF('docs/MatesANS.pdf','Matemáticas')" style="padding:12px;background:rgba(108,99,255,0.12);border:none;border-right:1px solid var(--border);color:var(--accent);font-family:var(--font);font-size:13px;cursor:pointer;font-weight:500;">📖 Lector</button>
+          <a href="docs/MatesANS.pdf" target="_blank" style="padding:12px;background:rgba(67,233,123,0.08);border:none;color:var(--accent3);font-family:var(--font);font-size:13px;cursor:pointer;font-weight:500;text-align:center;text-decoration:none;display:block;">🔗 Abrir PDF</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -233,14 +255,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <div class="screen" id="pdf-screen">
   <div class="topbar"><button class="back-btn" onclick="showScreen('solucionarios-screen')">← Volver</button><h1 id="pdf-title">PDF</h1></div>
   <div id="pdf-toolbar">
-    <button onclick="pdfPrev()">‹ Ant</button>
-    <span id="pdf-page-info">— / —</span>
-    <button onclick="pdfNext()">Sig ›</button>
-    <button onclick="pdfZoom(0.3)">＋</button>
-    <button onclick="pdfZoom(-0.3)">－</button>
+    <button onclick="pdfPrev()">‹</button>
+    <span id="pdf-page-info"></span>
+    <button onclick="pdfNext()">›</button>
+    <button onclick="pdfZoom(0.4)">＋</button>
+    <button onclick="pdfZoom(-0.4)">－</button>
+    <span style="font-size:10px;color:var(--muted);margin-left:4px;">← desliza →</span>
   </div>
-  <div id="pdf-canvas-wrap">
-    <div id="pdf-loading">Cargando PDF…</div>
+  <div class="content" style="padding:0;flex:1;display:flex;flex-direction:column;">
+    <div id="pdf-canvas-wrap" style="flex:1;overflow-y:auto;overflow-x:hidden;background:#2a2a2a;display:flex;flex-direction:column;align-items:center;padding:6px;"></div>
   </div>
 </div>
 
@@ -624,6 +647,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
+// Disable worker immediately so Apple Watch doesn't try to spawn one
+if(typeof pdfjsLib!=='undefined'){
+  pdfjsLib.GlobalWorkerOptions.workerSrc='';
+}
 // ---- NAVIGATION ----
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -638,44 +665,93 @@ function showScreen(id){
 }
 function goHome(){showScreen('home-screen');}
 
-// ---- PDF.js ----
-if(typeof pdfjsLib!=='undefined') pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-let pdfDoc=null,pdfScale=1.3,pdfTotal=0,pdfCur=1;
+// ---- PDF VIEWER (single-page, no worker, Watch-compatible) ----
 
-function openPDF(path,title){
+let pdfDoc=null, pdfCur=1, pdfTotal=0, pdfScale=1.4, pdfRendering=false, pdfPath='';
+
+function openPDF(path, title){
+  pdfPath=path;
   document.getElementById('pdf-title').textContent=title;
-  const wrap=document.getElementById('pdf-canvas-wrap');
-  wrap.innerHTML='<div id="pdf-loading">Cargando PDF…</div>';
-  pdfDoc=null;pdfScale=1.3;pdfCur=1;pdfTotal=0;
   showScreen('pdf-screen');
-  if(typeof pdfjsLib==='undefined'){wrap.innerHTML='<div id="pdf-loading" style="color:var(--accent2)">PDF.js no disponible. Asegúrate de estar conectado a internet.</div>';return;}
-  pdfjsLib.getDocument(path).promise.then(doc=>{
-    pdfDoc=doc;pdfTotal=doc.numPages;
-    wrap.innerHTML='';
-    renderAllPages();
-  }).catch(e=>{wrap.innerHTML='<div id="pdf-loading" style="color:var(--accent2)">Error: archivo no encontrado en '+path+'</div>';});
-}
+  pdfDoc=null; pdfCur=1; pdfTotal=0; pdfRendering=false;
+  pdfShowLoading('Cargando PDF…');
 
-async function renderAllPages(){
-  if(!pdfDoc)return;
-  const wrap=document.getElementById('pdf-canvas-wrap');
-  wrap.innerHTML='';
-  for(let i=1;i<=pdfTotal;i++){
-    const page=await pdfDoc.getPage(i);
-    const vp=page.getViewport({scale:pdfScale});
-    const canvas=document.createElement('canvas');
-    canvas.className='pdf-page-canvas';canvas.width=vp.width;canvas.height=vp.height;canvas.dataset.page=i;
-    wrap.appendChild(canvas);
-    await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
-    if(i===1) updatePDFInfo();
+  if(typeof pdfjsLib==='undefined'){
+    pdfShowLoading('⚠️ PDF.js no cargó. Necesitas conexión a internet la primera vez.');
+    return;
   }
-  updatePDFInfo();
+
+  // Use fake worker (no separate worker file needed — avoids Watch CORS/memory issues)
+  const loadTask = pdfjsLib.getDocument({url: path, disableWorker: true});
+  loadTask.promise.then(doc=>{
+    pdfDoc=doc;
+    pdfTotal=doc.numPages;
+    renderPage(1);
+  }).catch(err=>{
+    pdfShowLoading('❌ No se pudo cargar el PDF.<br><small>Verifica que el archivo existe en docs/</small>');
+  });
 }
 
-function pdfPrev(){if(!pdfDoc)return;pdfCur=Math.max(1,pdfCur-1);const el=document.querySelector(`.pdf-page-canvas[data-page="${pdfCur}"]`);if(el)el.scrollIntoView({behavior:'smooth'});updatePDFInfo();}
-function pdfNext(){if(!pdfDoc)return;pdfCur=Math.min(pdfTotal,pdfCur+1);const el=document.querySelector(`.pdf-page-canvas[data-page="${pdfCur}"]`);if(el)el.scrollIntoView({behavior:'smooth'});updatePDFInfo();}
-function pdfZoom(d){pdfScale=Math.min(3,Math.max(0.5,pdfScale+d));if(pdfDoc)renderAllPages();}
-function updatePDFInfo(){document.getElementById('pdf-page-info').textContent=pdfTotal?`${pdfCur}/${pdfTotal}`:'— / —';}
+function pdfShowLoading(msg){
+  const w=document.getElementById('pdf-canvas-wrap');
+  w.innerHTML=`<div style="color:var(--muted);font-size:13px;padding:40px 20px;text-align:center;line-height:1.6;">${msg}</div>`;
+}
+
+async function renderPage(n){
+  if(!pdfDoc||pdfRendering)return;
+  pdfRendering=true;
+  pdfCur=Math.max(1,Math.min(pdfTotal,n));
+
+  const wrap=document.getElementById('pdf-canvas-wrap');
+  wrap.innerHTML='<div style="color:var(--muted);font-size:12px;padding:20px;text-align:center;">Renderizando página '+pdfCur+'…</div>';
+
+  try{
+    const page=await pdfDoc.getPage(pdfCur);
+    // Auto-scale to fit screen width
+    const containerW=wrap.clientWidth||320;
+    const nativeVP=page.getViewport({scale:1});
+    const autoScale=Math.min(pdfScale, (containerW-8)/nativeVP.width);
+    const vp=page.getViewport({scale:autoScale});
+
+    const canvas=document.createElement('canvas');
+    canvas.width=vp.width;
+    canvas.height=vp.height;
+    canvas.style.cssText='display:block;max-width:100%;border-radius:6px;margin:4px auto;';
+
+    wrap.innerHTML='';
+    wrap.appendChild(canvas);
+    wrap.scrollTop=0;
+
+    await page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise;
+    updatePDFInfo();
+  } catch(e){
+    pdfShowLoading('❌ Error al renderizar página '+pdfCur);
+    console.error(e);
+  }
+  pdfRendering=false;
+}
+
+function pdfPrev(){ if(pdfCur>1) renderPage(pdfCur-1); }
+function pdfNext(){ if(pdfCur<pdfTotal) renderPage(pdfCur+1); }
+function pdfZoom(d){ pdfScale=Math.min(4,Math.max(0.6,pdfScale+d)); renderPage(pdfCur); }
+function updatePDFInfo(){ document.getElementById('pdf-page-info').textContent=pdfTotal?`${pdfCur} / ${pdfTotal}`:''; }
+
+// Swipe left/right on PDF canvas to change page
+(function(){
+  let sx=0,sy=0;
+  document.addEventListener('touchstart',e=>{
+    if(!document.getElementById('pdf-screen').classList.contains('active'))return;
+    sx=e.touches[0].clientX; sy=e.touches[0].clientY;
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(!document.getElementById('pdf-screen').classList.contains('active'))return;
+    const dx=e.changedTouches[0].clientX-sx;
+    const dy=Math.abs(e.changedTouches[0].clientY-sy);
+    if(Math.abs(dx)>50&&dy<60){ // horizontal swipe
+      if(dx<0) pdfNext(); else pdfPrev();
+    }
+  },{passive:true});
+})();
 
 // ---- VALENCIAS DATA ----
 const vData=[
@@ -881,7 +957,16 @@ function renderSudoku(){
   for(let r=0;r<9;r++)for(let c=0;c<9;c++){
     const idx=r*9+c;const cell=document.createElement('div');
     const isG=sudokuGiven[r][c]!==0;
-    cell.className='sudoku-cell'+(isG?' given':'')+(idx===sudokuSelected?' selected':'');
+    let cls='sudoku-cell';
+    if(isG) cls+=' given';
+    if(idx===sudokuSelected) cls+=' selected';
+    // thick right border after box columns (col 2 and 5, i.e. c=2,5)
+    if(c===2||c===5) cls+=' bx-r';
+    else if(c===8) cls+=' no-r';
+    // thick bottom border after box rows (row 2 and 5, i.e. r=2,5)
+    if(r===2||r===5) cls+=' bx-b';
+    else if(r===8) cls+=' no-b';
+    cell.className=cls;
     cell.dataset.idx=idx;cell.textContent=sudokuPuzzle[r][c]||'';
     if(!isG)cell.onclick=()=>{sudokuSelected=idx;document.querySelectorAll('.sudoku-cell').forEach(cc=>cc.classList.remove('selected'));cell.classList.add('selected');};
     g.appendChild(cell);

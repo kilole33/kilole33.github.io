@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energía y Mercado Eléctrico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (LIGHT THEME)
+           =========================================== */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-accent: #f0f4ff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a5568;
+            --accent-blue: #2563eb;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-orange: #f97316;
+            --accent-pink: #ec4899;
+            --accent-purple: #8b5cf6;
+
+            --font-display: "Syne", sans-serif;
+            --font-mono: "Space Mono", monospace;
+            --title-size: clamp(2.5rem, 7vw, 5.5rem);
+            --h2-size: clamp(1.5rem, 4vw, 3rem);
+            --h3-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            --body-size: clamp(0.85rem, 1.5vw, 1.1rem);
+
+            --slide-padding: clamp(1.5rem, 5vw, 5rem);
+            --content-gap: clamp(1rem, 2.5vw, 2.5rem);
+            --element-gap: clamp(0.5rem, 1vw, 1rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.8s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-display);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ===========================================
+           SLIDE BASE
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+        }
+
+        h1 {
+            font-size: var(--title-size);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+        }
+
+        h2 {
+            font-size: var(--h2-size);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: var(--content-gap);
+        }
+
+        h3 {
+            font-size: var(--h3-size);
+            font-weight: 600;
+        }
+
+        p, li {
+            font-size: var(--body-size);
+            line-height: 1.5;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.6s var(--ease-out-expo),
+                        transform 0.6s var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2) { transition-delay: 0.15s; }
+        .reveal:nth-child(3) { transition-delay: 0.25s; }
+        .reveal:nth-child(4) { transition-delay: 0.35s; }
+        .reveal:nth-child(5) { transition-delay: 0.45s; }
+        .reveal:nth-child(6) { transition-delay: 0.55s; }
+
+        .reveal-scale {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.8s var(--ease-out-expo),
+                        transform 0.8s var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal-scale {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ===========================================
+           TITLE SLIDE
+           =========================================== */
+        .title-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            text-align: center;
+            color: white;
+        }
+
+        .title-slide h1 {
+            color: white;
+        }
+
+        .title-slide .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .title-decoration {
+            width: 100px;
+            height: 5px;
+            background: white;
+            margin: var(--content-gap) auto;
+            border-radius: 3px;
+        }
+
+        .creators {
+            font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: var(--element-gap);
+        }
+
+        /* ===========================================
+           SECTION BADGE
+           =========================================== */
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            font-size: clamp(0.7rem, 1vw, 0.85rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 50px;
+            margin-bottom: var(--element-gap);
+            width: fit-content;
+        }
+
+        .badge-blue { background: var(--accent-blue); color: white; }
+        .badge-green { background: var(--accent-green); color: white; }
+        .badge-yellow { background: var(--accent-yellow); color: white; }
+        .badge-orange { background: var(--accent-orange); color: white; }
+        .badge-pink { background: var(--accent-pink); color: white; }
+        .badge-purple { background: var(--accent-purple); color: white; }
+
+        /* ===========================================
+           CARDS
+           =========================================== */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: var(--content-gap);
+            margin-top: var(--content-gap);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            padding: clamp(1.2rem, 2.5vw, 2rem);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .content-card .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: var(--element-gap);
+        }
+
+        .content-card h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .content-card p {
+            color: var(--text-secondary);
+        }
+
+        .card-blue .icon { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
+        .card-blue h3 { color: var(--accent-blue); }
+
+        .card-green .icon { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+        .card-green h3 { color: var(--accent-green); }
+
+        .card-yellow .icon { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+        .card-yellow h3 { color: var(--accent-yellow); }
+
+        .card-orange .icon { background: linear-gradient(135deg, #ffedd5, #fed7aa); }
+        .card-orange h3 { color: var(--accent-orange); }
+
+        .card-pink .icon { background: linear-gradient(135deg, #fce7f3, #fbcfe8); }
+        .card-pink h3 { color: var(--accent-pink); }
+
+        .card-purple .icon { background: linear-gradient(135deg, #ede9fe, #ddd6fe); }
+        .card-purple h3 { color: var(--accent-purple); }
+
+        /* ===========================================
+           LIST
+           =========================================== */
+        .bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--element-gap);
+        }
+
+        .bullet-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-accent);
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .bullet-list li::before {
+            content: "→";
+            color: var(--accent-blue);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* ===========================================
+           IMAGE SLIDES
+           =========================================== */
+        .image-slide {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--slide-padding);
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .image-slide {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .slide-image {
+            max-width: 100%;
+            max-height: min(55vh, 450px);
+            object-fit: cover;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .split-left {
+            display: flex;
+            flex-direction: column;
+            gap: var(--element-gap);
+        }
+
+        .split-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===========================================
+           FULL BLEED IMAGE
+           =========================================== */
+        .full-bleed {
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .full-bleed::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+            z-index: 1;
+        }
+
+        .full-bleed .slide-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .full-bleed h2, .full-bleed p {
+            color: white;
+        }
+
+        .full-bleed .subtitle {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* ===========================================
+           FORMULA BOX
+           =========================================== */
+        .formula-box {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            padding: clamp(1rem, 2vw, 1.5rem) clamp(1.5rem, 3vw, 3rem);
+            border-radius: 16px;
+            font-family: var(--font-mono);
+            font-size: clamp(1rem, 1.8vw, 1.4rem);
+            font-weight: 700;
+            margin: var(--content-gap) 0;
+        }
+
+        .formula-box span {
+            opacity: 0.9;
+        }
+
+        /* ===========================================
+           INTERACTIVE FORMULAS
+           =========================================== */
+        .formulas-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--content-gap);
+        }
+
+        .formula-group {
+            perspective: 1000px;
+        }
+
+        .formula-card {
+            background: white;
+            border-radius: 20px;
+            padding: clamp(1.2rem, 2.5vw, 2rem);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s ease;
+            position: relative;
+            overflow: visible;
+        }
+
+        .formula-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(37, 99, 235, 0.15);
+        }
+
+        .formula-display {
+            font-family: var(--font-mono);
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f0f4ff, #e8f4fd);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .formula-name {
+            font-size: var(--body-size);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .tooltips {
+            display: flex;
+            justify-content: center;
+            gap: clamp(1rem, 2vw, 2rem);
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .tooltip .symbol {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 700;
+            border-radius: 50%;
+            transition: all 0.3s var(--ease-out-expo);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .tooltip:hover .symbol {
+            transform: scale(1.2);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+        }
+
+        .tooltip .info {
+            position: absolute;
+            bottom: calc(100% + 15px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: white;
+            color: var(--text-primary);
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s var(--ease-out-expo);
+            z-index: 100;
+            text-align: left;
+        }
+
+        .tooltip .info::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 10px solid transparent;
+            border-top-color: white;
+        }
+
+        .tooltip:hover .info {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .tooltip .info strong {
+            display: block;
+            font-size: 1rem;
+            color: var(--accent-blue);
+            margin-bottom: 0.3rem;
+        }
+
+        .tooltip .info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .tooltip .info em {
+            color: var(--accent-purple);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        /* ===========================================
+           CALCULATION
+           =========================================== */
+        .calc-step {
+            background: var(--bg-accent);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: var(--element-gap);
+            border-left: 4px solid var(--accent-blue);
+            font-family: var(--font-mono);
+            font-size: var(--body-size);
+        }
+
+        .calc-step .highlight {
+            color: var(--accent-blue);
+            font-weight: 700;
+        }
+
+        .calc-step .result {
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+
+        /* ===========================================
+           DECORATIVE CIRCLES
+           =========================================== */
+        .deco-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .circle-1 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #dbeafe, #ede9fe);
+            top: -200px;
+            right: -150px;
+        }
+
+        .circle-2 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #d1fae5, #fef3c7);
+            bottom: -150px;
+            left: -100px;
+        }
+
+        /* ===========================================
+           NAVIGATION
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: clamp(1rem, 2vw, 2rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--accent-purple);
+            transform: scale(1.3);
+        }
+
+        .nav-dot:hover {
+            background: var(--accent-purple);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            z-index: 1001;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .slide-number {
+            position: fixed;
+            bottom: clamp(1rem, 2vw, 2rem);
+            right: clamp(1rem, 2vw, 2rem);
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.5rem, 1.5vw, 1rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            .nav-dots { display: none; }
+        }
+
+        @media (max-width: 600px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .image-slide { grid-template-columns: 1fr; }
+            .content-grid[style*="repeat(4"] { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-scale {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+            html { scroll-behavior: auto; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation Dots -->
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- Slide Number -->
+    <div class="slide-number" id="slideNumber">1 / 18</div>
+
+    <!-- SLIDE 1: TITLE -->
+    <section class="slide title-slide">
+        <div class="slide-content">
+            <h1 class="reveal">Energía y Mercado Eléctrico</h1>
+            <div class="title-decoration reveal"></div>
+            <p class="subtitle reveal">Generación, mercado y magnitudes eléctricas</p>
+            <p class="creators reveal">Daniel · Adrián · Abdul</p>
+        </div>
+    </section>
+
+    <!-- SLIDE 2: MERCADO ELÉCTRICO -->
+    <section class="slide" style="background: var(--bg-secondary);">
+        <div class="deco-circle circle-1"></div>
+        <div class="slide-content">
+            <span class="section-badge badge-blue reveal">01 Mercado Eléctrico</span>
+            <h2 class="reveal">¿Cómo funciona?</h2>
+            <div class="content-grid">
+                <div class="content-card card-blue reveal">
+                    <div class="icon">📈</div>
+                    <h3>Mercado Libre</h3>
+                    <p>Múltiples comercializadoras. Precio pactado directamente.</p>
+                </div>
+                <div class="content-card card-purple reveal">
+                    <div class="icon">⚡</div>
+                    <h3>Mercado Regulado</h3>
+                    <p>Precio variable cada hora según oferta y demanda.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 3: SUBASTA -->
+    <section class="slide">
+        <div class="slide-content">
+            <span class="section-badge badge-green reveal">02 Subasta Diaria</span>
+            <h2 class="reveal">¿Cómo se fija el precio?</h2>
+            <ul class="bullet-list">
+                <li class="reveal">Se fija cada día para cada hora del día siguiente</li>
+                <li class="reveal">Compradores solicitan demanda (ej: 30.000 MWh para 14-15h)</li>
+                <li class="reveal">Vendedores presentan ofertas: nuclear, hidráulica, solar, eólica</li>
+                <li class="reveal">Las ofertas entran por orden de precio (de más barata a más cara)</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- SLIDE 4: ORDEN DE PRECIO -->
+    <section class="slide" style="background: var(--bg-secondary);">
+        <div class="slide-content">
+            <span class="section-badge badge-yellow reveal">03 Orden de Precio</span>
+            <h2 class="reveal">¿Quién entra primero?</h2>
+            <p class="subtitle reveal" style="margin-bottom: var(--content-gap);">Las ofertas entran por precio, de más barata a más cara</p>
+            <div class="content-grid">
+                <div class="content-card card-green reveal">
+                    <div class="icon">🌬️</div>
+                    <h3>1ª Eólica y Solar</h3>
+                    <p>Gran inversión inicial, bajo coste operativo. Las más baratas.</p>
+                </div>
+                <div class="content-card card-blue reveal">
+                    <div class="icon">☢️</div>
+                    <h3>2ª Nuclear</h3>
+                    <p>Debe vender, no puede parar. Coste marginal bajo.</p>
+                </div>
+                <div class="content-card card-orange reveal">
+                    <div class="icon">💧</div>
+                    <h3>Última Hidráulica</h3>
+                    <p>Las más caras. El precio de la última lo pagan todas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 5: EUPHEMIA -->
+    <section class="slide">
+        <div class="deco-circle circle-2"></div>
+        <div class="slide-content">
+            <span class="section-badge badge-purple reveal">04 Algoritmo</span>
+            <h2 class="reveal">El Algoritmo EUPHEMIA</h2>
+            <ul class="bullet-list">
+                <li class="reveal">OMIE ordena ofertas de generación de menor a mayor precio</li>
+                <li class="reveal">Comercializadoras ordenan demanda de mayor a menor precio</li>
+                <li class="reveal">El punto de equilibrio determina precio y cantidad</li>
+                <li class="reveal">Calcula para cada hora del día siguiente</li>
+                <li class="reveal">Incluye interconexiones con mercados europeos</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- SLIDE 6: RENOVABLES INTRO -->
+    <section class="slide full-bleed" style="background-image: url('https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1920&q=80');">
+        <div class="slide-content">
+            <span class="section-badge badge-green reveal">05 Energías Renovables</span>
+            <h2 class="reveal">Se renuevan, no se agotan</h2>
+            <p class="subtitle reveal">Alternativa con impacto ambiental mínimo. Solar, eólica, hidráulica, geotérmica y biomasa.</p>
+        </div>
+    </section>
+
+    <!-- SLIDE 7: SOLAR -->
+    <section class="slide image-slide" style="background: var(--bg-primary);">
+        <div class="slide-content split-left">
+            <span class="section-badge badge-yellow reveal">06 Solar</span>
+            <h2 class="reveal">Energía Solar</h2>
+            <div class="reveal">
+                <p class="subtitle">Radiación del Sol: visible, infrarroja y ultravioleta.</p>
+                <ul class="bullet-list" style="margin-top: var(--element-gap);">
+                    <li><strong>Térmica:</strong> Calentar aire y agua</li>
+                    <li><strong>Fotovoltaica:</strong> Células solares para electricidad</li>
+                </ul>
+            </div>
+        </div>
+        <div class="split-right reveal-scale">
+            <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&q=80" alt="Panel solar" class="slide-image">
+        </div>
+    </section>
+
+    <!-- SLIDE 8: EÓLICA -->
+    <section class="slide image-slide" style="background: var(--bg-secondary);">
+        <div class="split-right reveal-scale">
+            <img src="https://images.unsplash.com/photo-1532601224476-15c79f2f7a51?w=800&q=80" alt="Aerogeneradores" class="slide-image">
+        </div>
+        <div class="slide-content split-left">
+            <span class="section-badge badge-blue reveal">07 Eólica</span>
+            <h2 class="reveal">Energía del Viento</h2>
+            <div class="reveal">
+                <p class="subtitle">Energía cinética de las corrientes de aire.</p>
+                <ul class="bullet-list" style="margin-top: var(--element-gap);">
+                    <li>Origen: masas de aire por radiación solar</li>
+                    <li>Generador eléctrico en eje de turbina</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 9: HIDRÁULICA -->
+    <section class="slide image-slide" style="background: var(--bg-primary);">
+        <div class="slide-content split-left">
+            <span class="section-badge badge-green reveal">08 Hidráulica</span>
+            <h2 class="reveal">Energía Hidráulica</h2>
+            <div class="reveal">
+                <p class="subtitle">De la energía cinética y potencial de ríos.</p>
+                <ul class="bullet-list" style="margin-top: var(--element-gap);">
+                    <li>Turbina hidráulica + generador eléctrico</li>
+                    <li>Energía limpia y renovable</li>
+                </ul>
+            </div>
+        </div>
+        <div class="split-right reveal-scale">
+            <img src="https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&q=80" alt="Central hidroeléctrica" class="slide-image">
+        </div>
+    </section>
+
+    <!-- SLIDE 10: OTRAS RENOVABLES -->
+    <section class="slide" style="background: var(--bg-secondary);">
+        <div class="slide-content">
+            <span class="section-badge badge-purple reveal">09 Otras Renovables</span>
+            <h2 class="reveal">Geotérmica y Biomasa</h2>
+            <div class="content-grid">
+                <div class="content-card card-orange reveal">
+                    <div class="icon">🌋</div>
+                    <h3>Geotérmica</h3>
+                    <p>Calor del interior terrestre. Agua y gases calientes para calefacción.</p>
+                </div>
+                <div class="content-card card-green reveal">
+                    <div class="icon">🌿</div>
+                    <h3>Biomasa</h3>
+                    <p>Energía en seres vivos. Combustión, electricidad, biocombustibles.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 11: NO RENOVABLES -->
+    <section class="slide" style="background: var(--bg-primary);">
+        <div class="slide-content">
+            <span class="section-badge badge-orange reveal">10 Fuentes Tradicionales</span>
+            <h2 class="reveal">Energías No Renovables</h2>
+            <p class="subtitle reveal" style="margin-bottom: var(--content-gap);">Existen en cantidad limitada y se agotan</p>
+            <div class="content-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="content-card card-orange reveal">
+                    <img src="https://solarplacas.es/wp-content/uploads/que-forma-de-energia-es-el-carbon-1.webp" alt="Carbón" style="width: 100%; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 0.75rem;">
+                    <h3 style="color: var(--accent-orange);">Carbón</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Central térmica</p>
+                </div>
+                <div class="content-card card-orange reveal">
+                    <img src="https://www.caixabankresearch.com/sites/default/files/styles/destacado/public/content/image/2022/04/11/34529/imatge-web-petroli.jpg" alt="Petróleo" style="width: 100%; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 0.75rem;">
+                    <h3 style="color: var(--accent-orange);">Petróleo</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Derivados del crudo</p>
+                </div>
+                <div class="content-card card-orange reveal">
+                    <img src="https://www.pypesa.com/contenido/a85ca3f50_blog_.jpg" alt="Gas Natural" style="width: 100%; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 0.75rem;">
+                    <h3 style="color: var(--accent-orange);">Gas Natural</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Combustión limpia</p>
+                </div>
+                <div class="content-card card-orange reveal">
+                    <img src="https://blog.ucs.org/wp-content/uploads/2026/04/Blog-Thumbnail-Chernobyl-1000x600.jpg" alt="Nuclear" style="width: 100%; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 0.75rem;">
+                    <h3 style="color: var(--accent-orange);">Nuclear</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Fisión del uranio</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 12: IMPACTO -->
+    <section class="slide full-bleed" style="background-image: url('https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=1920&q=80');">
+        <div class="slide-content">
+            <span class="section-badge badge-pink reveal">11 Impacto Ambiental</span>
+            <h2 class="reveal">El Problema</h2>
+            <ul class="bullet-list">
+                <li class="reveal">Gases de efecto invernadero y cambio climático</li>
+                <li class="reveal">Lluvia ácida y deforestación</li>
+                <li class="reveal">Deshielo y aumento del nivel del mar</li>
+            </ul>
+            <div class="content-card reveal" style="margin-top: var(--content-gap); background: white; color: var(--text-primary);">
+                <h3 style="color: var(--accent-blue);">Protocolo de Kyoto</h3>
+                <p style="color: var(--text-primary);">Objetivo: reducir las emisiones de gases de efecto invernadero</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 13: CONCLUSIÓN -->
+    <section class="slide title-slide">
+        <div class="slide-content">
+            <h2 class="reveal" style="font-size: clamp(2rem, 5vw, 4rem); max-width: 900px; margin: 0 auto;">
+                debemos avanzar en tecnologías renovables para asegurar el desarrollo sostenible
+            </h2>
+            <div class="title-decoration reveal"></div>
+        </div>
+    </section>
+
+    <!-- SLIDE 14: MAGNITUDES -->
+    <section class="slide" style="background: var(--bg-secondary);">
+        <div class="slide-content">
+            <span class="section-badge badge-blue reveal">12 Magnitudes Eléctricas</span>
+            <h2 class="reveal">Magnitudes: ¿Cómo funcionan los circuitos eléctricos?</h2>
+            <p class="subtitle reveal" style="margin-bottom: var(--content-gap);">Son las magnitudes fundamentales que describen el comportamiento de la electricidad</p>
+            <h3 class="reveal" style="color: var(--accent-purple); margin-bottom: var(--element-gap);">▼ Magnitudes</h3>
+            
+            <div class="formulas-container reveal">
+                <div class="formula-group">
+                    <div class="formula-card" data-formula="ohm">
+                        <div class="formula-display">U = I × R</div>
+                        <div class="formula-name">Ley de Ohm</div>
+                        <div class="tooltips">
+                            <div class="tooltip" data-symbol="U">
+                                <span class="symbol">U</span>
+                                <span class="info">
+                                    <strong>Voltaje</strong>
+                                    <p>Diferencia de potencial eléctrico. Se mide en <em>Voltios (V)</em>. Es la "presión" que impulsa a los electrones a través del circuito.</p>
+                                </span>
+                            </div>
+                            <div class="tooltip" data-symbol="I">
+                                <span class="symbol">I</span>
+                                <span class="info">
+                                    <strong>Intensidad</strong>
+                                    <p>Cantidad de corriente que circula. Se mide en <em>Amperios (A)</em>. Es el "caudal" de electrones.</p>
+                                </span>
+                            </div>
+                            <div class="tooltip" data-symbol="R">
+                                <span class="symbol">R</span>
+                                <span class="info">
+                                    <strong>Resistencia</strong>
+                                    <p>Oposición al paso de corriente. Se mide en <em>Ohmios (Ω)</em>. Como un atasco en una tubería.</p>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formula-group">
+                    <div class="formula-card" data-formula="potencia">
+                        <div class="formula-display">P = U × I = R × I²</div>
+                        <div class="formula-name">Potencia Eléctrica</div>
+                        <div class="tooltips">
+                            <div class="tooltip" data-symbol="P">
+                                <span class="symbol">P</span>
+                                <span class="info">
+                                    <strong>Potencia</strong>
+                                    <p>Energía consumida por segundo. Se mide en <em>Vatios (W)</em>. Cuanto más alta, más "fuerza" tiene el aparato.</p>
+                                </span>
+                            </div>
+                            <div class="tooltip" data-symbol="U2">
+                                <span class="symbol">U</span>
+                                <span class="info">
+                                    <strong>Voltaje</strong>
+                                    <p>Diferencia de potencial. Se mide en <em>Voltios (V)</em>.</p>
+                                </span>
+                            </div>
+                            <div class="tooltip" data-symbol="I2">
+                                <span class="symbol">I</span>
+                                <span class="info">
+                                    <strong>Intensidad</strong>
+                                    <p>Corriente que circula. Se mide en <em>Amperios (A)</em>.</p>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formula-group">
+                    <div class="formula-card" data-formula="energia">
+                        <div class="formula-display">W = P × t</div>
+                        <div class="formula-name">Energía Eléctrica</div>
+                        <div class="tooltips">
+                            <div class="tooltip" data-symbol="W">
+                                <span class="symbol">W</span>
+                                <span class="info">
+                                    <strong>Energía</strong>
+                                    <p>Potencia consumida durante un tiempo. Se mide en <em>Wh (Vatios-hora)</em>. Lo que pagas en tu factura.</p>
+                                </span>
+                            </div>
+                            <div class="tooltip" data-symbol="P2">
+                                <span class="symbol">P</span>
+                                <span class="info">
+                                    <strong>Potencia</strong>
+                                    <p>Energía por segundo. Se mide en <em>Vatios (W)</em>.</p>
+                                </span>
+                            </div>
+                            <div class="tooltip" data-symbol="t">
+                                <span class="symbol">t</span>
+                                <span class="info">
+                                    <strong>Tiempo</strong>
+                                    <p>Duración del consumo. Se mide en <em>horas (h)</em>.</p>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 15: EJERCICIO -->
+    <section class="slide">
+        <div class="slide-content">
+            <span class="section-badge badge-yellow reveal">13 Ejercicio</span>
+            <h2 class="reveal">Cálculo de Pérdidas</h2>
+            <p class="subtitle reveal" style="margin-bottom: var(--element-gap);">
+                Línea bifilar cobre, 3mm², 60m. Motor 2kW a 380V. ρ<sub>Cu</sub> = 1,7×10⁻⁸ Ωm
+            </p>
+            <div class="calc-step reveal"><code>R = ρ·l/S = <span class="result">0,68 Ω</span></code></div>
+            <div class="calc-step reveal"><code>I = P/U = <span class="result">5,26 A</span></code></div>
+            <div class="calc-step reveal"><code>P<sub>perdida</sub> = R·I² = <span class="result">18,81 W</span></code></div>
+        </div>
+    </section>
+
+    <!-- SLIDE 16: AGENTES -->
+    <section class="slide" style="background: var(--bg-secondary);">
+        <div class="slide-content">
+            <span class="section-badge badge-purple reveal">14 Agentes</span>
+            <h2 class="reveal">Actores del Sistema</h2>
+            <div class="content-grid">
+                <div class="content-card card-green reveal">
+                    <div class="icon">🏭</div>
+                    <h3>Productores</h3>
+                    <p>Generan energía (renovable o no)</p>
+                </div>
+                <div class="content-card card-blue reveal">
+                    <div class="icon">🔌</div>
+                    <h3>Transporte (REE)</h3>
+                    <p>Infraestructuras de muy alta tensión</p>
+                </div>
+                <div class="content-card card-yellow reveal">
+                    <div class="icon">🏠</div>
+                    <h3>Distribuidoras</h3>
+                    <p>A consumidores. Oligopolio 90%.</p>
+                </div>
+                <div class="content-card card-pink reveal">
+                    <div class="icon">🛒</div>
+                    <h3>Comercializadoras</h3>
+                    <p>Intermediarios en mercado libre</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 17: PRECIO -->
+    <section class="slide">
+        <div class="slide-content">
+            <span class="section-badge badge-green reveal">15 Precio</span>
+            <h2 class="reveal">¿Cómo se determina?</h2>
+            <ul class="bullet-list">
+                <li class="reveal">Mercado español de tipo <strong>marginalista</strong></li>
+                <li class="reveal">Día antes: ofertas vía OMIE para cada hora</li>
+                <li class="reveal">EUHEMIA ordena curvas de oferta y demanda</li>
+                <li class="reveal">Punto de intersección = precio del mercado</li>
+                <li class="reveal">Comercializadoras suman costes regulados</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- SLIDE 18: CIERRE -->
+    <section class="slide title-slide">
+        <div class="slide-content">
+            <h1 class="reveal">¡Gracias!</h1>
+            <div class="title-decoration reveal"></div>
+            <p class="subtitle reveal">Energía y Mercado Eléctrico</p>
+        </div>
+    </section>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.totalSlides = this.slides.length;
+                this.currentSlide = 0;
+                this.navDots = document.getElementById('navDots');
+                this.progressBar = document.getElementById('progressBar');
+                this.slideNumber = document.getElementById('slideNumber');
+                this.init();
+            }
+
+            init() {
+                this.createNavDots();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.updateProgress();
+            }
+
+            createNavDots() {
+                this.navDots.innerHTML = '';
+                this.slides.forEach((_, i) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    this.navDots.appendChild(dot);
+                });
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            const idx = Array.from(this.slides).indexOf(entry.target);
+                            this.currentSlide = idx;
+                            this.updateNavDots();
+                            this.updateProgress();
+                            this.slideNumber.textContent = `${idx + 1} / ${this.totalSlides}`;
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(s => observer.observe(s));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', e => {
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                        e.preventDefault();
+                        if (this.currentSlide < this.totalSlides - 1) this.goToSlide(this.currentSlide + 1);
+                    }
+                    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                        e.preventDefault();
+                        if (this.currentSlide > 0) this.goToSlide(this.currentSlide - 1);
+                    }
+                });
+            }
+
+            goToSlide(i) {
+                if (i >= 0 && i < this.totalSlides) this.slides[i].scrollIntoView({ behavior: 'smooth' });
+            }
+
+            updateNavDots() {
+                this.navDots.querySelectorAll('.nav-dot').forEach((d, i) => d.classList.toggle('active', i === this.currentSlide));
+            }
+
+            updateProgress() {
+                this.progressBar.style.width = `${((this.currentSlide + 1) / this.totalSlides) * 100}%`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new SlidePresentation());
+    </script>
+</body>
+</html>
